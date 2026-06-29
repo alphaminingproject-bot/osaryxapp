@@ -267,7 +267,8 @@ function adminAdjustBalance(uid, direction) {
     if (!u) { adminToast('User not found', 'err'); return; }
     u.balance += direction * amount;
     if (u.balance < 0) u.balance = 0;
-    DB.logTransaction(u.id, u.name, 'admin_adjust', 'Admin ' + (direction>0?'credit':'debit'), direction*amount, u.balance);
+    const adjustLabel = direction > 0 ? 'Balance credit by admin' : 'Balance deduction by admin';
+    DB.logTransaction(u.id, u.name, 'admin_adjust', adjustLabel, direction*amount, u.balance);
     DB.saveUser(u).then(() => { adminToast((direction>0?'Added ':'Deducted ')+amount, 'suc'); doUserLookup(); });
   });
 }
@@ -459,9 +460,7 @@ function confirmNFTDispatch() {
     .then(() => DB.setNFTDispatchStatus(p.nftId, 'sent'))
     .then(() => DB.getUser(p.userId))
     .then(u => {
-      if (!u) return;
-      /* Log record only — amount 0 means no OSARYX created or destroyed */
-      DB.logTransaction(u.id, u.name, 'nft_dispatch', 'Relic dispatched', 0, u.balance, token, amount);
+      /* No OSARYX transaction log for NFT dispatch — external transfer only */
     })
     .then(() => DB.sendAdminMessage(p.userId, '✅ Your relic has been dispatched!\n\nSent: ' + amount + ' ' + token + '\nTransaction ID: ' + txnId))
     .then(() => { adminToast('Dispatch confirmed ✅', 'suc'); closeNFTTxnModal(); loadNFTRequests(); })
@@ -891,8 +890,7 @@ function confirmOsaryxNFTDispatch() {
         return DB.setOsaryxNFTDispatchStatus(p.nftId, 'sent')
           .then(() => DB.getUser(p.userId))
           .then(u => {
-            if (!u) return;
-            DB.logTransaction(u.id, u.name, 'nft_dispatch', 'OSARYX NFT dispatched: ' + (p.nftName||p.nftId), 0, u.balance);
+            /* No OSARYX transaction log for NFT dispatch — external transfer only */
           })
           .then(() => DB.sendAdminMessage(
             p.userId,

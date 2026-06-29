@@ -186,11 +186,16 @@ function setupRealtimeSync() {
       fresh.taskStates     = currentUser.taskStates;
       fresh.taskHandles    = currentUser.taskHandles;
       fresh.completedTasks = currentUser.completedTasks;
-      fresh.stakes         = currentUser.stakes;
-      currentUser = fresh;
-      recalcMiningState();
-      updateDisplay();
-      renderShopState();
+      /* Refresh vaults from DB so vault cancellations/fills show immediately */
+      DB.getVaultsFor(fresh.id).then(vaults => {
+        fresh.stakes = vaults;
+        currentUser = fresh;
+        recalcMiningState();
+        updateDisplay();
+        renderShopState();
+        renderStakes();
+        updateStakePreview();
+      });
     });
   });
 
@@ -321,8 +326,8 @@ function checkUserNotifications() {
       if (item.status === 'verified') {
         showToast('✅ Quest "' + item.taskName + '" verified! +' + item.reward + ' ' + CFG.TOKEN_NAME, 'suc');
       } else if (item.status === 'rejected') {
-        showToast('❌ Quest "' + item.taskName + '" was not completed. Tap RETRY to redo it.', 'err');
-        /* Write rejected state back so button flips from PENDING → RETRY */
+        showToast('❌ Quest "' + item.taskName + '" was not completed. Tap the task icon to redo it, then verify again.', 'err');
+        /* Write rejected state back so button flips from PENDING → VERIFY AGAIN */
         if (currentUser.taskStates[item.taskId] === 'pending') {
           currentUser.taskStates[item.taskId] = 'rejected';
           changed = true;
@@ -739,8 +744,9 @@ function buildEventBanner(ev) {
   const eventCompleted = !!currentUser.completedTasks['event_' + ev.id];
   const banner = document.createElement('div');
   banner.className = 'task-card event-banner';
-  const btnLabel = eventCompleted ? 'EVENT COMPLETED ✅' : 'JOIN EVENT →';
-  const btnClass = eventCompleted ? 'task-btn verify' : 'task-btn go';
+  const actionHtml = eventCompleted
+    ? '<div class="task-btn verify" style="opacity:0.7;pointer-events:none;">EVENT COMPLETED ✅</div>'
+    : '<button class="task-btn go" onclick="openEventModal(\'' + ev.id + '\')">JOIN EVENT →</button>';
   banner.innerHTML =
     '<div class="task-icon">' + (ev.icon||'📣') + '</div>' +
     '<div class="task-info">' +
@@ -749,7 +755,7 @@ function buildEventBanner(ev) {
       '<div class="task-desc">' + esc(ev.desc||'') + '</div>' +
       '<div class="task-reward">+' + ev.reward + ' ' + CFG.TOKEN_NAME + ' total reward</div>' +
     '</div>' +
-    '<button class="' + btnClass + '" ' + (eventCompleted ? 'disabled' : 'onclick="openEventModal(\'' + ev.id + '\')"') + '>' + btnLabel + '</button>';
+    actionHtml;
   return banner;
 }
 
@@ -784,10 +790,13 @@ function openEventModal(evId) {
       const xHtml = (t.xFollow || t.type === 'x_follow')
         ? '<div class="x-input-wrap" id="xwrap_ev_' + taskKey + '"><input class="x-input" id="xinput_ev_' + taskKey + '" placeholder="@yourhandle"/><button class="x-submit-btn" onclick="submitEventXHandle(\'' + ev.id + '\',\'' + t.id + '\',\'' + esc(t.name) + '\')">SUBMIT</button></div>'
         : '';
-      return '<div class="task-card"><div class="task-icon">' + (t.icon||'🎯') + '</div>'
+      const taskIconOnclick = (t.type === 'auto_ref' || t.type === 'watch_ad' || !t.target)
+        ? '' : 'onclick="goTaskLink(\'' + t.type + '\',\'' + (t.target||'') + '\')" style="cursor:pointer;" title="Tap to open task link"';
+      return '<div class="task-card"><div class="task-icon" ' + taskIconOnclick + '>' + (t.icon||'🎯') + '</div>'
         + '<div class="task-info"><div class="task-name">' + esc(t.name) + '</div>'
         + '<div class="task-desc">' + esc(t.desc||'') + '</div>' + xHtml + '</div>' + btnHtml + '</div>';
     }).join('');
+
     showModal('modal-event');
   });
 }
@@ -917,12 +926,11 @@ function buildTaskCard(task) {
   const state = (currentUser.taskStates||{})[task.id] || 'go';
   const card  = document.createElement('div');
   card.className = 'task-card';
-
-  /* Icon always navigates to target so users can always reach the link
-     regardless of task state — clicking the icon is never blocked. */
+  /* Icon always navigates to target — works for ALL task types including Telegram.
+     Tapping icon lets users go back to complete or redo any task. */
   const iconOnclick = (task.type === 'auto_ref' || task.type === 'watch_ad' || !task.target)
     ? ''
-    : 'onclick="goTaskLink(\'' + task.type + '\',\'' + (task.target||'') + '\')" style="cursor:pointer;" title="Open task link"';
+    : 'onclick="goTaskLink(\'' + task.type + '\',\'' + (task.target||'') + '\')" style="cursor:pointer;" title="Tap to open task link"';
 
   let btnHtml;
   if (task.type === 'auto_ref') {
@@ -930,16 +938,16 @@ function buildTaskCard(task) {
   } else if (state === 'pending') {
     btnHtml = '<button class="task-btn pending">PENDING</button>';
   } else if (state === 'rejected') {
-    btnHtml = '<button class="task-btn rejected" onclick="retryTask(\'' + task.id + '\')">RETRY</button>';
+    btnHtml = '<button class="task-btn verify" onclick="resetAndVerify(\'' + task.id + '\',\'' + task.type + '\',\'' + (task.target||'') + '\')" >VERIFY AGAIN</button>';
   } else if (state === 'verify') {
     if (task.xFollow || task.type === 'x_follow') {
       btnHtml = '<button class="task-btn verify" onclick="showXInput(\'' + task.id + '\')">VERIFY</button>';
     } else {
-      btnHtml = '<button class="task-btn verify" onclick="verifyTelegramTask(\'' + task.id + '\',' + task.reward + ',\'' + (task.target||'') + '\',\'' + task.type + '\')">VERIFY</button>'
-        + ' <button class="task-btn rejected" style="margin-left:4px;" onclick="retryTask(\'' + task.id + '\')" title="Restart">↺</button>';
+      btnHtml = '<button class="task-btn verify" onclick="verifyTelegramTask(\'' + task.id + '\',' + task.reward + ',\'' + (task.target||'') + '\',\'' + task.type + '\')">VERIFY</button>';
     }
   } else {
     btnHtml = '<button class="task-btn go" onclick="goTask(\'' + task.id + '\',\'' + (task.type||'') + '\',\'' + (task.target||'') + '\')">EMBARK →</button>';
+  }
   }
 
   const xHtml = (task.xFollow || task.type === 'x_follow')
@@ -1027,6 +1035,14 @@ function verifyTelegramTask(id, reward, target, type) {
 }
 
 function retryTask(id) { currentUser.taskStates[id] = 'go'; persist(currentUser); renderTasks(); }
+
+/* resetAndVerify: used when task was rejected — takes user back to verify state
+   so they can resubmit after redoing the task via the icon link */
+function resetAndVerify(id, type, target) {
+  currentUser.taskStates[id] = 'verify';
+  persist(currentUser);
+  renderTasks();
+}
 function showXInput(id) { const w = document.getElementById('xwrap_' + id); if (w) w.classList.toggle('show'); }
 
 function submitXHandle(id, reward, taskName) {
@@ -1063,6 +1079,7 @@ function payZeusWithStars() {
 function payZeusWithTon() {
   closeModal('modal-zeus');
   DB.getTonConfig().then(cfg => {
+    document.getElementById('ton-amount-display').textContent  = (cfg.ton_price || cfg.price || '2') + ' TON';
     document.getElementById('ton-address-display').textContent = cfg.address || 'Address not configured';
     document.getElementById('ton-memo-display').textContent    = currentUser.id;
     showModal('modal-zeus-ton');
@@ -1262,7 +1279,7 @@ function renderRefs() {
     const verified = refs.filter(r => r.status === 'verified').length;
     document.getElementById('ref-count').textContent  = refs.length;
     document.getElementById('ref-earned').textContent = '+' + (verified * CFG.REF_BONUS) + ' ' + CFG.TOKEN_NAME + ' channelled · +5% of all soul harvests';
-    const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + '?startapp=ref_' + currentUser.id;
+    const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + CFG.APP_NAME + '?startapp=ref_' + currentUser.id;
     document.getElementById('ref-link-box').textContent = link;
     document.getElementById('ref-list').innerHTML = refs.map(r =>
       '<div class="ref-item"><div class="ref-av">👤</div><div class="ref-user">'
@@ -1296,15 +1313,23 @@ function openHistory() {
   const body = document.getElementById('history-body');
   body.innerHTML = '<div class="empty-note">Reading the ledger...</div>';
   DB.getTransactionsFor(currentUser.id, 100).then(hist => {
-    body.innerHTML = !hist.length ? '<div class="empty-note">The ledger is empty</div>' : hist.map(h => {
+    const filteredHist = (hist || []).filter(h => h.type !== 'nft_dispatch');
+    body.innerHTML = !filteredHist.length ? '<div class="empty-note">The ledger is empty</div>' : filteredHist.map(h => {
       let amtLine;
-      if (h.type === 'nft_dispatch' && h.external_token && h.external_amount != null) {
-        amtLine = '<span class="hist-amt pos">+' + h.external_amount + ' ' + esc(h.external_token) + '</span>';
-      } else {
-        const pos = h.amount >= 0;
-        amtLine = '<span class="hist-amt ' + (pos?'pos':'neg') + '">' + (pos?'+':'') + Number(h.amount).toFixed(1) + ' ' + CFG.TOKEN_NAME + '</span>';
-      }
-      return '<div class="hist-item"><div class="hist-row1"><span class="hist-type">' + h.type.toUpperCase() + '</span>' + amtLine + '</div>'
+      const pos = h.amount >= 0;
+      amtLine = '<span class="hist-amt ' + (pos?'pos':'neg') + '">' + (pos?'+':'') + Number(h.amount).toFixed(1) + ' ' + CFG.TOKEN_NAME + '</span>';
+      const typeLabels = {
+        'mine': 'HARVEST', 'task': 'QUEST REWARD', 'event': 'EVENT REWARD',
+        'ref_bonus': 'REFERRAL BONUS', 'ref_percent': 'REFERRAL SHARE',
+        'stake': 'VAULT DEPOSIT', 'unstake': 'VAULT RETURN',
+        'rune_buy': 'RUNE BOUND', 'storage_buy': 'STORAGE BOUND',
+        'nft_buy': 'NFT PURCHASE', 'nft_dispatch': 'NFT DISPATCHED',
+        'admin_adjust': h.amount >= 0 ? 'BALANCE CREDIT' : 'BALANCE DEDUCTION',
+        'airdrop': 'AIRDROP', 'zeus_settlement': 'ZEUS HARVEST',
+        'watch_ad': 'AD REWARD'
+      };
+      const typeLabel = typeLabels[h.type] || h.type.toUpperCase().replace(/_/g,' ');
+      return '<div class="hist-item"><div class="hist-row1"><span class="hist-type">' + typeLabel + '</span>' + amtLine + '</div>'
         + '<div class="hist-txn">TXN: ' + h.txn_id + '</div>'
         + '<div class="hist-ts">' + new Date(h.ts).toLocaleString() + ' · Bal: ' + formatNum(h.balance_after) + '</div></div>';
     }).join('');

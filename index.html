@@ -12,7 +12,36 @@
 
 <div id="splash">
   <div class="splash-ring">
-    <div class="splash-ring-placeholder">𝕆</div>
+    <div class="splash-ring-placeholder">
+      <svg width="54" height="54" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="splashIris" cx="40%" cy="38%" r="60%">
+            <stop offset="0%" stop-color="#e8b84b"/>
+            <stop offset="40%" stop-color="#c9922a"/>
+            <stop offset="75%" stop-color="#7a1a1a"/>
+            <stop offset="100%" stop-color="#050407"/>
+          </radialGradient>
+          <radialGradient id="splashPupil" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c0392b"/>
+            <stop offset="100%" stop-color="#050407"/>
+          </radialGradient>
+        </defs>
+        <circle cx="120" cy="120" r="112" stroke="#c9922a" stroke-width="2" fill="none" opacity="0.5"/>
+        <line x1="120" y1="4" x2="120" y2="20" stroke="#c9922a" stroke-width="3" opacity="0.9"/>
+        <line x1="120" y1="220" x2="120" y2="236" stroke="#c9922a" stroke-width="3" opacity="0.9"/>
+        <line x1="4" y1="120" x2="20" y2="120" stroke="#c9922a" stroke-width="3" opacity="0.9"/>
+        <line x1="220" y1="120" x2="236" y2="120" stroke="#c9922a" stroke-width="3" opacity="0.9"/>
+        <polygon points="120,30 208,78 208,168 120,216 32,168 32,78" stroke="#c9922a" stroke-width="2" fill="rgba(201,146,42,0.04)" opacity="0.6"/>
+        <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" fill="#050407" opacity="0.98"/>
+        <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" stroke="#c9922a" stroke-width="2.5" fill="none" opacity="0.9"/>
+        <circle cx="120" cy="120" r="36" fill="url(#splashIris)"/>
+        <circle cx="120" cy="120" r="36" stroke="#c9922a" stroke-width="2" fill="none" opacity="0.7"/>
+        <circle cx="120" cy="120" r="18" fill="url(#splashPupil)"/>
+        <ellipse cx="120" cy="120" rx="6" ry="15" fill="#050407"/>
+        <ellipse cx="120" cy="120" rx="2.5" ry="6" fill="rgba(192,57,43,0.9)"/>
+        <circle cx="112" cy="112" r="4" fill="rgba(232,184,75,0.4)"/>
+      </svg>
+    </div>
     <div class="splash-spin"></div>
   </div>
   <div class="splash-name">OSARYX</div>
@@ -56,7 +85,31 @@
               </defs>
             </svg>
             <div class="balance-inner">
-              <div class="ring-logo">𝕆</div>
+              <div class="ring-logo">
+                <svg width="38" height="38" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="ringIris" cx="40%" cy="38%" r="60%">
+                      <stop offset="0%" stop-color="#e8b84b"/>
+                      <stop offset="40%" stop-color="#c9922a"/>
+                      <stop offset="75%" stop-color="#7a1a1a"/>
+                      <stop offset="100%" stop-color="#050407"/>
+                    </radialGradient>
+                    <radialGradient id="ringPupil" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#c0392b"/>
+                      <stop offset="100%" stop-color="#050407"/>
+                    </radialGradient>
+                  </defs>
+                  <polygon points="120,30 208,78 208,168 120,216 32,168 32,78" stroke="#c9922a" stroke-width="3" fill="rgba(201,146,42,0.04)" opacity="0.7"/>
+                  <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" fill="#050407" opacity="0.98"/>
+                  <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" stroke="#c9922a" stroke-width="3" fill="none" opacity="1"/>
+                  <circle cx="120" cy="120" r="36" fill="url(#ringIris)"/>
+                  <circle cx="120" cy="120" r="36" stroke="#c9922a" stroke-width="2" fill="none" opacity="0.7"/>
+                  <circle cx="120" cy="120" r="18" fill="url(#ringPupil)"/>
+                  <ellipse cx="120" cy="120" rx="6" ry="15" fill="#050407"/>
+                  <ellipse cx="120" cy="120" rx="2.5" ry="6" fill="rgba(192,57,43,0.9)"/>
+                  <circle cx="112" cy="112" r="4" fill="rgba(232,184,75,0.4)"/>
+                </svg>
+              </div>
               <div class="mult-badge" id="mult-badge" style="display:none;">2×</div>
             </div>
           </div>
@@ -124,15 +177,11 @@
         <div class="forge-section-title">⚡ MULTIPLIER RUNES</div>
         <div class="rune-row">
           <div class="rune-chip">
-            <div class="rune-mult">2×</div>
             <div class="rune-name">Shadow Rune</div>
-            <div class="rune-cost">300 OSARYX</div>
             <button class="rune-buy-btn" id="buy-shadow-btn" onclick="buyRune('shadow')">BIND</button>
           </div>
           <div class="rune-chip">
-            <div class="rune-mult">4×</div>
             <div class="rune-name">Oracle Core</div>
-            <div class="rune-cost">500 OSARYX</div>
             <button class="rune-buy-btn" id="buy-oracle-btn" onclick="buyRune('oracle')">BIND</button>
           </div>
         </div>
@@ -291,6 +340,7 @@
   <div class="modal-box">
     <div class="modal-title">💎 Pay with TON</div>
     <div class="modal-chain-note">⚠ Send only on the <b>TON network</b>. Other chains will be lost.</div>
+    <div class="ton-pay-row"><div class="ton-pay-label">AMOUNT</div><div class="ton-pay-value" id="ton-amount-display" style="color:var(--gold);font-weight:bold;">...</div></div>
     <div class="ton-pay-row"><div class="ton-pay-label">ADDRESS</div><div class="ton-pay-value" id="ton-address-display">...</div><button class="ton-copy-btn" onclick="copyTonAddress()">📋</button></div>
     <div class="ton-pay-row"><div class="ton-pay-label">MEMO (required)</div><div class="ton-pay-value" id="ton-memo-display">...</div></div>
     <div class="modal-chain-note" style="margin-top:10px;">Your memo is necessary for the transaction to be confirmed. After sending, paste your transaction ID or link below.</div>
