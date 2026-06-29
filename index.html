@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+  <title>OSARYX</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <link rel="stylesheet" href="app.css"/>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-ring">
+    <div class="splash-ring-placeholder">𝕆</div>
+    <div class="splash-spin"></div>
+  </div>
+  <div class="splash-name">OSARYX</div>
+  <div class="splash-dots">AWAKENING...</div>
+</div>
+
+<div id="app" style="display:none;">
+
+  <div class="header">
+    <div class="header-avatar" id="avatar-btn" onclick="openProfile()">O</div>
+    <div class="header-info">
+      <div class="header-name" id="hdr-name">Loading...</div>
+      <div class="header-id" id="hdr-id">ID: ---</div>
+    </div>
+    <div class="header-right">
+      <button class="history-btn" onclick="openHistory()" title="Ledger">⏱</button>
+      <div class="header-bal">
+        <div class="header-bal-num" id="hdr-bal">0</div>
+        <div class="header-bal-label">OSARYX</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pages">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="balance-block">
+        <div id="normal-mine-block">
+          <div class="balance-ring">
+            <svg viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(240,180,41,0.07)" stroke-width="7"/>
+              <circle id="bal-arc" cx="80" cy="80" r="72" fill="none" stroke="url(#og)" stroke-width="7"
+                stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="452"
+                transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 0.9s ease;"/>
+              <defs>
+                <linearGradient id="og" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#c88b00"/>
+                  <stop offset="100%" stop-color="#f0b429"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="balance-inner">
+              <div class="ring-logo">𝕆</div>
+              <div class="mult-badge" id="mult-badge" style="display:none;">2×</div>
+            </div>
+          </div>
+          <div class="mining-counter">
+            <div class="mining-num" id="bal-num">0</div>
+            <div class="mining-label">OSARYX MINING</div>
+          </div>
+          <button class="mine-btn" id="mine-btn" style="display:none;" onclick="handleMine()">⚡ HARVEST OSARYX</button>
+          <div class="mine-timer" id="mine-timer"></div>
+        </div>
+
+        <div id="zeus-active-block" style="display:none;">
+          <div class="zeus-nft-frame">
+            <div class="zeus-divine-rays"></div>
+            <div class="zeus-nft-glow"></div>
+            <div class="zeus-nft-ring r1"></div>
+            <div class="zeus-nft-ring r2"></div>
+            <div class="zeus-spark"></div>
+            <div class="zeus-spark"></div>
+            <div class="zeus-spark"></div>
+            <div class="zeus-spark"></div>
+            <div class="zeus-nft-art">⚡</div>
+            <div class="zeus-pedestal-glow"></div>
+          </div>
+          <div class="zeus-active-title">ZEUS EMPOWERS YOUR HARVEST</div>
+          <div class="zeus-active-sub">10× essence accrues continuously — no claiming required</div>
+          <div class="zeus-time-left" id="zeus-time-left">7d 0h 0m remaining</div>
+        </div>
+      </div>
+
+      <div class="convert-wrap">
+        <div class="convert-title">CONVERT</div>
+        <div class="convert-soon">🌙 COMING SOON</div>
+        <div class="convert-sub">OSARYX → GRAM conversion descends upon the realm</div>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="page" id="page-tasks">
+      <div class="sec-title">✦ SACRED QUESTS</div>
+      <div id="tasks-list"></div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="page" id="page-shop">
+      <div class="sec-title">✦ ARCANE FORGE</div>
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="switchSubTab('miners',this)">RUNES</button>
+        <button class="sub-tab" onclick="switchSubTab('stake',this)">STAKING</button>
+        <button class="sub-tab" onclick="switchSubTab('nft',this)">OSARYX NFTS</button>
+        <button class="sub-tab" onclick="switchSubTab('market',this)">MARKET</button>
+      </div>
+
+      <div class="sub-page active" id="sub-miners">
+        <div class="forge-section-title">⚡ EPIC GOD</div>
+        <div class="zeus-card" onclick="openZeusModal()">
+          <div class="zeus-card-art">⚡</div>
+          <div class="zeus-card-body">
+            <div class="zeus-card-name">Zeus, God of Lightning</div>
+            <div class="zeus-card-desc">10× mining speed · 7 days · accrues automatically, no claiming</div>
+            <div class="zeus-card-price">150 ⭐ Stars or TON</div>
+          </div>
+        </div>
+
+        <div class="forge-section-title">⚡ MULTIPLIER RUNES</div>
+        <div class="rune-row">
+          <div class="rune-chip">
+            <div class="rune-mult">2×</div>
+            <div class="rune-name">Shadow Rune</div>
+            <div class="rune-cost">300 OSARYX</div>
+            <button class="rune-buy-btn" id="buy-shadow-btn" onclick="buyRune('shadow')">BIND</button>
+          </div>
+          <div class="rune-chip">
+            <div class="rune-mult">4×</div>
+            <div class="rune-name">Oracle Core</div>
+            <div class="rune-cost">500 OSARYX</div>
+            <button class="rune-buy-btn" id="buy-oracle-btn" onclick="buyRune('oracle')">BIND</button>
+          </div>
+        </div>
+
+        <div class="forge-section-title">⏳ STORAGE VESSELS</div>
+        <div class="storage-list">
+          <div class="storage-card">
+            <div class="storage-info"><div class="storage-name">6-Hour Vessel</div><div class="storage-sub">Claim every 6 hours · 3 days</div></div>
+            <button class="storage-buy-btn" id="buy-storage-6-btn" onclick="buyStorage(6)">500 OSARYX</button>
+          </div>
+          <div class="storage-card">
+            <div class="storage-info"><div class="storage-name">12-Hour Vessel</div><div class="storage-sub">Claim every 12 hours · 3 days</div></div>
+            <button class="storage-buy-btn" id="buy-storage-12-btn" onclick="buyStorage(12)">1,000 OSARYX</button>
+          </div>
+          <div class="storage-card">
+            <div class="storage-info"><div class="storage-name">24-Hour Vessel</div><div class="storage-sub">Claim every 24 hours · 3 days</div></div>
+            <button class="storage-buy-btn" id="buy-storage-24-btn" onclick="buyStorage(24)">2,000 OSARYX</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-page" id="sub-stake">
+        <div class="stake-hero">
+          <div class="stake-hero-symbol">⚖</div>
+          <div class="stake-hero-title">THE ETERNAL VAULT</div>
+          <div class="stake-hero-sub">Consecrate OSARYX to the Vault.<br>Every 1,000 staked yields 100 over 7 days.</div>
+          <div class="stake-rate-card"><div class="stake-rate-num">10%</div><div class="stake-rate-label">YIELD PER 7 DAYS</div></div>
+        </div>
+        <div class="form-card-stake">
+          <div class="stake-input-label">AMOUNT TO CONSECRATE (min. 1,000)</div>
+          <div class="stake-input-row">
+            <input class="stake-input" id="stake-amount-input" type="number" min="1000" step="1000" placeholder="1000"/>
+            <button class="stake-max-btn" onclick="stakeSetMax()">MAX</button>
+          </div>
+          <div class="stake-preview" id="stake-preview">Yield: — OSARYX in 7 days</div>
+          <button class="miner-buy-btn" onclick="doStake()" style="margin-top:14px;">⚖ CONSECRATE TO THE VAULT</button>
+        </div>
+        <div class="sec-title" style="margin-top:20px;">✦ YOUR ACTIVE VAULTS</div>
+        <div id="stake-list"></div>
+      </div>
+
+      <div class="sub-page" id="sub-nft">
+        <div class="sec-title">✦ OSARYX NFTS</div>
+        <div class="coming-soon-wrap" id="osaryx-nft-coming-soon">
+          <div class="coming-soon-btn">✦ COMING SOON ✦</div>
+          <div class="coming-soon-sub">THE MYSTIC RELIQUARY AWAKENS SOON</div>
+        </div>
+        <div id="osaryx-nft-list" style="display:none;"></div>
+      </div>
+
+      <div class="sub-page" id="sub-market">
+        <div class="sec-title">✦ NFT MARKET</div>
+        <div id="nft-market-list"></div>
+      </div>
+    </div>
+
+    <!-- ROADMAP -->
+    <div class="page" id="page-road">
+      <div class="sec-title">✦ THE PROPHECY</div>
+      <div class="roadmap">
+        <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">🚀 The Awakening</div><div class="rm-sub">OSARYX Token airdrop descends</div></div></div>
+        <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">⚖ The Eternal Vault</div><div class="rm-sub">Staking ritual unlocked</div></div></div>
+        <div class="rm-item"><div class="rm-dot current"></div><div><div class="rm-name">🖼 The Mystic Reliquary</div><div class="rm-sub">Exclusive NFT artefacts forge their forms</div></div></div>
+        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">💱 The Grand Transmutation</div><div class="rm-sub">OSARYX → GRAM — the final alchemy</div></div></div>
+        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">🌐 The Ascension</div><div class="rm-sub">OSARYX listed across exchanges</div></div></div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="page" id="page-lb">
+      <div class="sec-title">✦ THE CHRONICLES</div>
+      <div class="lb-podium" id="lb-podium"></div>
+      <div id="lb-list"></div>
+    </div>
+
+    <!-- REFERRALS -->
+    <div class="page" id="page-ref">
+      <div class="ref-hero">
+        <div class="ref-count" id="ref-count">0</div>
+        <div class="ref-label">SOULS INVOKED</div>
+        <div class="ref-earned" id="ref-earned">+0 OSARYX channelled</div>
+      </div>
+      <div class="ref-link-card">
+        <div class="ref-link-label">YOUR INVOCATION SCROLL</div>
+        <div class="ref-link-box" id="ref-link-box">...</div>
+        <button class="copy-btn" onclick="copyRefLink()">📋 COPY SCROLL</button>
+        <button class="share-btn" onclick="shareRefLink()">↗ DISPATCH VIA TELEGRAM</button>
+      </div>
+      <div class="sec-title">✦ INVOKED SOULS</div>
+      <div id="ref-list"></div>
+    </div>
+
+  </div>
+
+  <nav class="nav">
+    <button class="nav-btn active" id="nav-home" onclick="switchPage('home',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span>HOME</span><div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-tasks" onclick="switchPage('tasks',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      <span>QUESTS</span><div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-shop" onclick="switchPage('shop',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      <span>FORGE</span><div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-road" onclick="switchPage('road',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      <span>PROPHECY</span><div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-lb" onclick="switchPage('lb',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span>RANKS</span><div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-ref" onclick="switchPage('ref',this)">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span>INVOKE</span><div class="nav-dot"></div>
+    </button>
+  </nav>
+</div>
+
+<div class="overlay" id="overlay-history">
+  <div class="overlay-header"><div class="overlay-title">⏱ Sacred Ledger</div><button class="overlay-close" onclick="closeOverlay('overlay-history')">✕</button></div>
+  <div class="overlay-body" id="history-body"></div>
+</div>
+
+<div class="overlay" id="overlay-profile">
+  <div class="overlay-header"><div class="overlay-title">✦ Acolyte Profile</div><button class="overlay-close" onclick="closeOverlay('overlay-profile')">✕</button></div>
+  <div class="overlay-body" id="profile-body"></div>
+</div>
+
+<div class="modal" id="modal-send">
+  <div class="modal-box">
+    <div class="modal-title">Dispatch Relic</div>
+    <div class="modal-chain-note" id="modal-chain-note">Send only a <b>TON</b> address</div>
+    <input class="modal-input" id="send-address-input" placeholder="Enter wallet address..."/>
+    <div class="modal-btns">
+      <button class="modal-ok" onclick="confirmSendNFT()">DISPATCH</button>
+      <button class="modal-cancel" onclick="closeModal('modal-send')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-zeus">
+  <div class="modal-box">
+    <div class="modal-title">⚡ Awaken Zeus</div>
+    <div class="modal-chain-note">10× mining for 7 days. Choose your offering:</div>
+    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()">⭐ Pay 150 Stars</button>
+    <button class="modal-ok" style="background:linear-gradient(135deg,#0d4fd6,#1a6fff);margin-bottom:8px;" onclick="payZeusWithTon()">💎 Pay with TON</button>
+    <button class="modal-cancel" onclick="closeModal('modal-zeus')">CANCEL</button>
+  </div>
+</div>
+
+<div class="modal" id="modal-zeus-ton">
+  <div class="modal-box">
+    <div class="modal-title">💎 Pay with TON</div>
+    <div class="modal-chain-note">⚠ Send only on the <b>TON network</b>. Other chains will be lost.</div>
+    <div class="ton-pay-row"><div class="ton-pay-label">ADDRESS</div><div class="ton-pay-value" id="ton-address-display">...</div><button class="ton-copy-btn" onclick="copyTonAddress()">📋</button></div>
+    <div class="ton-pay-row"><div class="ton-pay-label">MEMO (required)</div><div class="ton-pay-value" id="ton-memo-display">...</div></div>
+    <div class="modal-chain-note" style="margin-top:10px;">Your memo is necessary for the transaction to be confirmed. After sending, paste your transaction ID or link below.</div>
+    <input class="modal-input" id="ton-txn-input" placeholder="Transaction ID or link" style="margin-top:10px;"/>
+    <div class="modal-btns">
+      <button class="modal-ok" onclick="submitZeusTonTxn()">SUBMIT</button>
+      <button class="modal-cancel" onclick="closeModal('modal-zeus-ton')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal" id="modal-event">
+  <div class="modal-box" style="max-width:520px;max-height:80vh;overflow-y:auto;">
+    <div class="modal-title" id="event-modal-title">📣 Event</div>
+    <div class="modal-chain-note" id="event-modal-reward" style="margin-bottom:14px;color:var(--gold);"></div>
+    <div id="event-modal-tasks"></div>
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="modal-cancel" onclick="closeEventModal()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

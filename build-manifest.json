@@ -1,0 +1,18 @@
+{
+  "builtAt": "2026-06-29T10:37:48.818Z",
+  "tokenName": "OSARYX",
+  "botUser": "OSARYXBot",
+  "appName": "Osaryx",
+  "files": [
+    "data.js",
+    "admin.js",
+    "app.js",
+    "index.html",
+    "admin.html",
+    "app.css",
+    "admin.css",
+    "schema.sql",
+    "README.md",
+    "bot.js"
+  ]
+}

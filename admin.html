@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>OSARYX Admin</title>
+  <link rel="stylesheet" href="admin.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">OSARYX</div>
+    <div class="login-sub">ADMIN DASHBOARD</div>
+    <div class="login-auth-note">🔐 Password + Authenticator Required</div>
+    <input class="login-input" id="pw-input" type="password" placeholder="Admin password"/>
+    <div class="login-totp-wrap">
+      <div class="login-totp-label">AUTHENTICATOR CODE (6 digits)</div>
+      <input class="login-input" id="totp-input" type="number" placeholder="000000" maxlength="6" style="letter-spacing:4px;text-align:center;"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">ACCESS DASHBOARD</button>
+    <div class="login-err" id="login-err">Incorrect password or code</div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-text">OSARYX</div>
+      <div class="sidebar-logo-sub">ADMIN PANEL</div>
+    </div>
+
+    <div class="nav-group-label">OVERVIEW</div>
+    <div class="nav-item active" onclick="showSection('overview',this)">📊 Overview</div>
+    <div class="nav-item" onclick="showSection('users',this)">👥 Active Users</div>
+    <div class="nav-item" onclick="showSection('user-search',this)">🔍 User Lookup</div>
+    <div class="nav-item" onclick="showSection('txn-search',this)">🧾 Transaction Lookup</div>
+
+    <div class="nav-group-label">MODERATION</div>
+    <div class="nav-item" onclick="showSection('verify-ref',this)">🤝 Verify Refs <span class="badge-dot" id="dot-ref"></span></div>
+    <div class="nav-item" onclick="showSection('verify-x',this)">🐦 Verify X Tasks <span class="badge-dot" id="dot-x"></span></div>
+    <div class="nav-item" onclick="showSection('nft-requests',this)">📬 NFT Dispatch <span class="badge-dot" id="dot-nft"></span></div>
+    <div class="nav-item" onclick="showSection('epic-gods',this)">⚡ Epic Gods <span class="badge-dot" id="dot-zeus"></span></div>
+
+    <div class="nav-group-label">CONTENT</div>
+    <div class="nav-item" onclick="showSection('tasks',this)">✅ Manage Tasks</div>
+    <div class="nav-item" onclick="showSection('events',this)">📣 Events</div>
+    <div class="nav-item" onclick="showSection('nft-market',this)">🖼 NFT Market</div>
+    <div class="nav-item" onclick="showSection('osaryx-nft-launch',this)">⚡ Launch OSARYX NFT</div>
+    <div class="nav-item" onclick="showSection('osaryx-nft-requests',this)">📬 OSARYX NFT Dispatch <span class="badge-dot" id="dot-osaryx-nft"></span></div>
+
+    <div class="nav-group-label">TOOLS</div>
+    <div class="nav-item" onclick="showSection('airdrop',this)">🪂 Airdrop</div>
+    <div class="nav-item" onclick="showSection('leaderboard',this)">🏆 Leaderboard</div>
+    <div class="nav-item" onclick="showSection('maintenance',this)">🔒 Maintenance</div>
+    <div class="nav-item" onclick="showSection('backup',this)">💾 Backup Data</div>
+
+    <div class="sidebar-footer">OSARYX Admin v3</div>
+  </div>
+
+  <div class="main">
+
+    <div class="section active" id="section-overview">
+      <div class="page-title">Overview</div>
+      <div class="page-sub">REAL-TIME STATISTICS</div>
+      <div class="stats-row" style="grid-template-columns:repeat(5,1fr);">
+        <div class="stat-card"><div class="stat-label">TOTAL USERS</div><div class="stat-val" id="ov-users">0</div></div>
+        <div class="stat-card green"><div class="stat-label">ONLINE (2 MIN)</div><div class="stat-val" id="ov-online">0</div></div>
+        <div class="stat-card"><div class="stat-label">TOTAL MINED</div><div class="stat-val" id="ov-mined">0</div></div>
+        <div class="stat-card gold"><div class="stat-label">TOTAL SUPPLY</div><div class="stat-val" id="ov-supply">0</div></div>
+        <div class="stat-card blue"><div class="stat-label">SUPPLY LEFT</div><div class="stat-val" id="ov-left">0</div></div>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">RECENT ACTIVITY</span><button class="refresh-btn" onclick="loadOverview()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>USER</th><th>ID</th><th>BALANCE</th><th>RUNE</th><th>STATUS</th><th>LAST SEEN</th></tr></thead>
+          <tbody id="ov-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-users">
+      <div class="page-title">Active Users</div>
+      <div class="page-sub">ALL REGISTERED SOULS</div>
+      <div class="tbl-card">
+        <div class="tbl-head">
+          <span class="tbl-title">USER LIST</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="user-search-inline" class="form-input" style="width:200px;padding:6px 10px;" placeholder="Search name, @username or ID..." oninput="loadUsers()"/>
+            <button class="refresh-btn" onclick="loadUsers()">↻</button>
+          </div>
+        </div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>NAME</th><th>USERNAME</th><th>ID</th><th>BALANCE</th><th>RUNE</th><th>LAST SEEN</th><th>ACTION</th></tr></thead>
+          <tbody id="users-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-user-search">
+      <div class="page-title">User Lookup</div>
+      <div class="page-sub">SEARCH BY TELEGRAM ID OR @USERNAME</div>
+      <div class="form-card">
+        <div class="form-title">ENTER USER ID OR @USERNAME</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input class="form-input" id="lookup-id-input" placeholder="e.g. 123456789 or @username" style="flex:1;min-width:180px;"/>
+          <button class="btn primary" onclick="doUserLookup()">SEARCH</button>
+        </div>
+      </div>
+      <div id="lookup-result"></div>
+    </div>
+
+    <div class="section" id="section-txn-search">
+      <div class="page-title">Transaction Lookup</div>
+      <div class="page-sub">SEARCH BY EXACT TRANSACTION ID</div>
+      <div class="form-card">
+        <div class="form-title">ENTER TRANSACTION ID</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input class="form-input" id="txn-lookup-input" placeholder="e.g. TXN123456789..." style="flex:1;min-width:180px;"/>
+          <button class="btn primary" onclick="doTxnLookup()">SEARCH</button>
+        </div>
+      </div>
+      <div id="txn-lookup-result"></div>
+    </div>
+
+    <div class="section" id="section-verify-ref">
+      <div class="page-title">Verify Referrals</div>
+      <div class="page-sub">PENDING REF APPROVALS</div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">PENDING REFERRALS</span><button class="refresh-btn" onclick="loadRefQueue()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>REFERRER</th><th>REFEREE</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody id="ref-queue-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-verify-x">
+      <div class="page-title">Verify X Tasks</div>
+      <div class="page-sub">CROSS-CHECK SUBMITTED HANDLES</div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">SUBMISSIONS</span><button class="refresh-btn" onclick="loadXQueue()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>USER</th><th>TASK</th><th>HANDLE</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody id="x-queue-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-nft-requests">
+      <div class="page-title">NFT Dispatch Requests</div>
+      <div class="page-sub">PENDING RELIC TRANSFERS</div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">DISPATCH QUEUE</span><button class="refresh-btn" onclick="loadNFTRequests()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>USER</th><th>NFT</th><th>CHAIN</th><th>ADDRESS</th><th>WORTH</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody id="nft-req-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-epic-gods">
+      <div class="page-title">Epic Gods — Zeus Requests</div>
+      <div class="page-sub">TON (manual verify) AND STARS (auto-verified) PURCHASES</div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">REQUESTS</span><button class="refresh-btn" onclick="loadEpicGods()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>USER</th><th>USERNAME</th><th>METHOD</th><th>TXN REF</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody id="epic-gods-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-tasks">
+      <div class="page-title">Manage Tasks</div>
+      <div class="page-sub">ADD · REMOVE TASKS</div>
+      <div class="form-card">
+        <div class="form-title">ADD NEW TASK</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">TASK NAME *</label><input class="form-input" id="t-name" placeholder="e.g. Follow on Instagram"/></div>
+          <div class="form-group"><label class="form-label">REWARD (OSARYX) *</label><input class="form-input" id="t-reward" type="number" min="1" placeholder="e.g. 25"/></div>
+          <div class="form-group">
+            <label class="form-label">TASK TYPE *</label>
+            <select class="form-select" id="t-type">
+              <option value="telegram_channel">Telegram Channel (auto-verified)</option>
+              <option value="telegram_group">Telegram Group (manual review)</option>
+              <option value="x_follow">X Follow (handle verify)</option>
+              <option value="link">External Link (manual review)</option>
+              <option value="watch_ad">Watch Ad (always pinned to top)</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">ICON (emoji)</label><input class="form-input" id="t-icon" placeholder="🎯"/></div>
+          <div class="form-group full"><label class="form-label">TARGET (URL or @channel)</label><input class="form-input" id="t-target" placeholder="@OSARYXOfficial or https://..."/></div>
+          <div class="form-group full"><label class="form-label">DESCRIPTION</label><input class="form-input" id="t-desc" placeholder="Short description shown to users"/></div>
+          <div class="form-group"><label class="form-label">CLICK CAP (optional)</label><input class="form-input" id="t-clickcap" type="number" min="1" placeholder="e.g. 500 — leave blank for unlimited"/></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" onclick="addTask()">ADD TASK</button><button class="btn ghost" onclick="clearTaskForm()">CLEAR</button></div>
+        <div class="totp-status" id="task-status"></div>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">ACTIVE TASKS</span><span class="tbl-badge" id="tasks-count-badge">0 tasks</span></div>
+        <div class="tbl-body" style="padding:10px;" id="tasks-admin-list"></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-events">
+      <div class="page-title">Events</div>
+      <div class="page-sub">CREATE PINNED MULTI-TASK EVENTS</div>
+      <div class="form-card">
+        <div class="form-title">CREATE EVENT</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">EVENT NAME *</label><input class="form-input" id="ev-name" placeholder="e.g. Launch Week"/></div>
+          <div class="form-group"><label class="form-label">EVENT ICON</label><input class="form-input" id="ev-icon" placeholder="📣"/></div>
+          <div class="form-group full"><label class="form-label">EVENT DESCRIPTION</label><input class="form-input" id="ev-desc" placeholder="Short description shown on the banner"/></div>
+          <div class="form-group"><label class="form-label">TOTAL REWARD (OSARYX) *</label><input class="form-input" id="ev-reward" type="number" min="1" placeholder="e.g. 500 — paid when ALL tasks done"/></div>
+          <div class="form-group"><label class="form-label">EXPIRY DATE/TIME</label><input class="form-input" id="ev-expiry" type="datetime-local" title="Leave blank for no expiry"/></div>
+        </div>
+
+        <div style="margin-top:16px;margin-bottom:8px;font-size:9px;letter-spacing:2px;color:var(--gold);">EVENT TASKS</div>
+        <div style="font-size:9px;color:var(--gray);margin-bottom:12px;">Each task is shown in the event modal. Users must complete ALL tasks to earn the total reward.</div>
+
+        <!-- First task row (always visible) -->
+        <div class="form-grid" id="ev-tasks-container">
+          <div class="form-group"><label class="form-label">TASK 1 NAME *</label><input class="form-input" id="ev-t-name" placeholder="e.g. Join Event Channel"/></div>
+          <div class="form-group"><label class="form-label">TASK 1 TYPE</label><select class="form-select" id="ev-t-type"><option value="telegram_channel">Telegram Channel</option><option value="x_follow">X Follow</option><option value="link">Link</option></select></div>
+          <div class="form-group"><label class="form-label">TASK 1 ICON</label><input class="form-input" id="ev-t-icon" placeholder="🎁"/></div>
+          <div class="form-group"><label class="form-label">TASK 1 TARGET</label><input class="form-input" id="ev-t-target" placeholder="@channel or https://..."/></div>
+        </div>
+
+        <div class="form-actions" style="margin-top:10px;">
+          <button class="btn ghost" onclick="addEventTaskRow()">＋ ADD ANOTHER TASK</button>
+        </div>
+
+        <div class="form-actions" style="margin-top:14px;">
+          <button class="btn primary" onclick="createOsaryxEvent()">CREATE EVENT</button>
+        </div>
+        <div class="totp-status" id="event-status"></div>
+      </div>
+      <div id="events-list"></div>
+    </div>
+
+    <div class="section" id="section-nft-market">
+      <div class="page-title">NFT Market</div>
+      <div class="page-sub">UPLOAD &amp; MANAGE NFT LISTINGS</div>
+      <div class="form-card">
+        <div class="form-title">ADD NFT LISTING</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">NFT NAME *</label><input class="form-input" id="nft-name" placeholder="e.g. Mystic Rune #1"/></div>
+          <div class="form-group"><label class="form-label">WORTH IN OSARYX *</label><input class="form-input" id="nft-worth" type="number" min="1" placeholder="e.g. 5000 — credited when dispatched"/></div>
+          <div class="form-group"><label class="form-label">CHAIN *</label><input class="form-input" id="nft-chain" placeholder="e.g. TON, ETH, BSC"/></div>
+          <div class="form-group full"><label class="form-label">IMAGE FILE *</label><div class="img-preview" id="nft-img-preview">No image selected</div><input type="file" accept="image/*" onchange="previewNFTImage()" id="nft-img-file"/></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" onclick="addNFTListing()">ADD LISTING</button></div>
+        <div class="totp-status" id="nft-status"></div>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">CURRENT LISTINGS</span></div>
+        <div class="tbl-body" style="padding:10px;" id="nft-listings-list"></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-osaryx-nft-launch">
+      <div class="page-title">Launch OSARYX NFT</div>
+      <div class="page-sub">EXCLUSIVE SINGLE-EDITION LAUNCHES — SEPARATE FROM THE GENERAL MARKET</div>
+      <div class="form-card">
+        <div class="form-title">LAUNCH NEW OSARYX NFT</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">NFT NAME *</label><input class="form-input" id="osaryx-nft-name" placeholder="e.g. Zeus Genesis"/></div>
+          <div class="form-group"><label class="form-label">WORTH IN OSARYX *</label><input class="form-input" id="osaryx-nft-worth" type="number" min="1" placeholder="e.g. 10000"/></div>
+          <div class="form-group"><label class="form-label">CHAIN *</label><input class="form-input" id="osaryx-nft-chain" placeholder="e.g. TON, ETH, BSC"/></div>
+          <div class="form-group full"><label class="form-label">IMAGE FILE *</label><div class="img-preview" id="osaryx-nft-img-preview">No image selected</div><input type="file" accept="image/*" onchange="previewOsaryxNFTImage()" id="osaryx-nft-img-file"/></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" onclick="launchOsaryxNFT()">LAUNCH NFT</button></div>
+        <div class="totp-status" id="osaryx-nft-status"></div>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">LAUNCHED OSARYX NFTS</span></div>
+        <div class="tbl-body" style="padding:10px;" id="osaryx-nft-listings-list"></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-osaryx-nft-requests">
+      <div class="page-title">OSARYX NFT Dispatch Requests</div>
+      <div class="page-sub">PENDING SINGLE-EDITION RELIC TRANSFERS</div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">DISPATCH QUEUE</span><button class="refresh-btn" onclick="loadOsaryxNFTRequests()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>USER</th><th>NFT</th><th>CHAIN</th><th>ADDRESS</th><th>WORTH</th><th>DATE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody id="osaryx-nft-req-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-airdrop">
+      <div class="page-title">Airdrop</div>
+      <div class="page-sub">SEND OSARYX TO A USER</div>
+      <div class="form-card">
+        <div class="form-title">AIRDROP TOKENS</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">USER ID *</label><input class="form-input" id="drop-id" placeholder="Telegram user ID"/></div>
+          <div class="form-group"><label class="form-label">AMOUNT (OSARYX) *</label><input class="form-input" id="drop-amount" type="number" min="1" placeholder="e.g. 1000"/></div>
+          <div class="form-group full"><label class="form-label">NOTE (optional)</label><input class="form-input" id="drop-note" placeholder="Reason for airdrop"/></div>
+        </div>
+        <div class="form-actions"><button class="btn primary" onclick="doAirdrop()">AIRDROP</button></div>
+        <div class="totp-status" id="airdrop-status"></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-leaderboard">
+      <div class="page-title">Leaderboard</div>
+      <div class="page-sub">TOP OSARYX MINERS</div>
+      <div class="tbl-card">
+        <div class="tbl-head"><span class="tbl-title">RANKINGS</span><button class="refresh-btn" onclick="loadLeaderboard()">↻ REFRESH</button></div>
+        <div class="tbl-body"><table>
+          <thead><tr><th>RANK</th><th>NAME</th><th>USERNAME</th><th>BALANCE</th></tr></thead>
+          <tbody id="lb-table"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="section" id="section-maintenance">
+      <div class="page-title">Maintenance Mode</div>
+      <div class="page-sub">PAUSE THE ENTIRE USER-FACING APP</div>
+      <div class="form-card">
+        <div class="toggle-row">
+          <span class="toggle-lbl">Maintenance mode is currently <b id="maint-status-text">OFF</b></span>
+          <div class="toggle" id="maint-toggle" onclick="toggleMaintenance()"><div class="toggle-dot"></div></div>
+        </div>
+        <div class="form-group full" style="margin-top:14px;">
+          <label class="form-label">MESSAGE SHOWN TO USERS</label>
+          <input class="form-input" id="maint-message" placeholder="OSARYX is undergoing a sacred ritual. Please return shortly."/>
+        </div>
+        <div class="form-actions"><button class="btn warning" onclick="saveMaintMessage()">UPDATE MESSAGE</button></div>
+        <p style="font-size:10px;color:var(--gray);margin-top:14px;line-height:1.6;">When turned ON: every user instantly sees a maintenance screen and cannot access the app. Admin dashboard stays accessible. When turned back OFF: all unaffected users resume normally.</p>
+      </div>
+    </div>
+
+    <div class="section" id="section-backup">
+      <div class="page-title">Backup Data</div>
+      <div class="page-sub">EXPORT ALL DATA</div>
+      <div class="form-card">
+        <div class="form-title">EXPORT</div>
+        <button class="btn primary" onclick="downloadBackup()">⬇ DOWNLOAD BACKUP</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-message-user">
+  <div class="modal-box-admin">
+    <div class="modal-title">Send Message to User</div>
+    <textarea class="form-textarea" id="msg-user-text" placeholder="Your message will be sent via the bot..."></textarea>
+    <div class="form-actions">
+      <button class="btn primary" onclick="confirmSendUserMessage()">SEND</button>
+      <button class="btn ghost" onclick="closeMessageModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-nft-txn">
+  <div class="modal-box-admin">
+    <div class="modal-title">Confirm Dispatch</div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="form-group"><label class="form-label">TOKEN SENT *</label><input class="form-input" id="nft-dispatch-token" placeholder="e.g. USDT, TON"/></div>
+      <div class="form-group"><label class="form-label">AMOUNT SENT *</label><input class="form-input" id="nft-dispatch-amount" type="number" step="any" placeholder="e.g. 2"/></div>
+    </div>
+    <input class="form-input" id="nft-txn-input" placeholder="Transaction ID or link" style="margin-bottom:0;"/>
+    <div class="form-actions">
+      <button class="btn success" onclick="withButtonGuard(this,function(){return confirmNFTDispatch();})">CONFIRM SENT</button>
+      <button class="btn ghost" onclick="closeNFTTxnModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-task-detail">
+  <div class="modal-box-admin" style="max-width:520px;">
+    <div class="modal-title" id="task-detail-title">Task Details</div>
+    <div style="font-size:10px;color:var(--gray);margin-bottom:14px;" id="task-detail-sub"></div>
+    <div class="tbl-card" style="margin-bottom:0;">
+      <div class="tbl-head"><span class="tbl-title">CLICK LOG (EMBARK PRESSES)</span></div>
+      <div class="tbl-body" style="max-height:360px;overflow-y:auto;"><table>
+        <thead><tr><th>USER</th><th>USER ID</th><th>CLICKED AT</th></tr></thead>
+        <tbody id="task-click-log-table"></tbody>
+      </table></div>
+    </div>
+    <div class="form-actions" style="margin-top:14px;"><button class="btn ghost" onclick="closeTaskDetailModal()">CLOSE</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-osaryx-nft-txn">
+  <div class="modal-box-admin">
+    <div class="modal-title">Confirm OSARYX NFT Dispatch</div>
+    <div style="font-size:10px;color:var(--gray);margin-bottom:12px;" id="osaryx-nft-dispatch-label">NFT: —</div>
+    <label class="form-label" style="display:block;margin-bottom:6px;">TRANSACTION ID *</label>
+    <input class="form-input" id="osaryx-nft-txn-input" placeholder="Transaction ID or link" style="margin-bottom:0;"/>
+    <div class="form-actions">
+      <button class="btn success" onclick="withButtonGuard(this,function(){return confirmOsaryxNFTDispatch();})">CONFIRM SENT</button>
+      <button class="btn ghost" onclick="closeOsaryxNFTTxnModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="admin-toast"></div>
+
+<script src="data.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
