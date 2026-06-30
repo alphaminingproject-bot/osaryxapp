@@ -559,7 +559,7 @@ function renderShopState() {
     const cost = type==='shadow' ? CFG.SHADOW_COST : CFG.ORACLE_COST;
     btn.textContent = active  ? 'ACTIVE — ' + timeLeftStr(u.runeExpiresAt)
                    : blocked ? 'ANOTHER RUNE ACTIVE'
-                   : ((type==='shadow' ? 'BIND SHADOW RUNE — ' : 'BIND ORACLE CORE — ') + cost + ' OSARYX');
+                   : ('BIND — ' + cost + ' OSARYX');
   });
 
   [6,12,24].forEach(hours => {
@@ -576,7 +576,7 @@ function renderShopState() {
     const cost = hours===6 ? CFG.STORAGE_6H_COST : hours===12 ? CFG.STORAGE_12H_COST : CFG.STORAGE_24H_COST;
     btn.textContent = active  ? 'ACTIVE — ' + timeLeftStr(u.storageExpiresAt)
                    : blocked ? 'ANOTHER STORAGE ACTIVE'
-                   : ('BIND ' + hours + 'H STORAGE — ' + cost + ' OSARYX');
+                   : (cost.toLocaleString() + ' OSARYX');
   });
 }
 
