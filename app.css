@@ -173,13 +173,7 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .sub-page.active { display:block; animation:fadeUp 0.2s ease; }
 .forge-section-title { font-size:9px; letter-spacing:2px; color:var(--gold2); margin:16px 0 10px; }
 .forge-section-title:first-child { margin-top:0; }
-.rune-row { display:flex; gap:10px; }
-.rune-chip { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center; }
-.rune-mult { font-size:26px; font-weight:bold; color:var(--gold); text-shadow:0 0 14px var(--goldglow); }
-.rune-name { font-size:10px; color:var(--white); margin-top:4px; }
-.rune-cost { font-size:9px; color:var(--gray); margin-top:2px; margin-bottom:10px; }
-.rune-buy-btn { width:100%; padding:9px; background:linear-gradient(135deg,var(--gold2),var(--gold)); border:none; border-radius:8px; color:#000; font-family:var(--font); font-size:9px; font-weight:bold; cursor:pointer; }
-.rune-buy-btn:disabled { background:var(--gray2); color:var(--gray); cursor:not-allowed; }
+
 .storage-list { display:flex; flex-direction:column; gap:8px; }
 .storage-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .storage-info { flex:1; min-width:0; }
