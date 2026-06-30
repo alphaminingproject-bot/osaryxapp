@@ -948,7 +948,6 @@ function buildTaskCard(task) {
   } else {
     btnHtml = '<button class="task-btn go" onclick="goTask(\'' + task.id + '\',\'' + (task.type||'') + '\',\'' + (task.target||'') + '\')">EMBARK →</button>';
   }
-  }
 
   const xHtml = (task.xFollow || task.type === 'x_follow')
     ? '<div class="x-input-wrap" id="xwrap_' + task.id + '"><input class="x-input" id="xinput_' + task.id + '" placeholder="@yourhandle"/>'
