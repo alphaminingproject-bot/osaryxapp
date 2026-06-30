@@ -1250,23 +1250,54 @@ function buyOsaryxNFT(nftId) {
 ══════════════════════════════════════════════ */
 function renderLeaderboard() {
   document.getElementById('lb-podium').innerHTML = '<div class="empty-note">Reading the chronicles...</div>';
-  DB.getAllUsersForLeaderboard(50).then(all => {
-    if (!all.some(u => u.id === String(currentUser.id))) all.push(currentUser);
-    all.sort((a, b) => b.balance - a.balance);
-    const top3 = all.slice(0,3), rest = all.slice(3,50);
-    const order = [top3[1], top3[0], top3[2]].filter(Boolean);
-    const rkC = ['r2','r1','r3'], rkB = ['b2','b1','b3'], medals = ['🥈','🥇','🥉'], nums = [2,1,3];
-    document.getElementById('lb-podium').innerHTML = order.map((u, p) =>
-      '<div class="podium-item"><div class="podium-av ' + rkC[p] + '">' + medals[p] + '<div class="podium-badge">' + nums[p] + '</div></div>'
-      + '<div class="podium-name">' + esc(u.name) + '</div><div class="podium-score">' + formatNum(u.balance) + '</div>'
-      + '<div class="podium-block ' + rkB[p] + '"></div></div>'
-    ).join('');
-    document.getElementById('lb-list').innerHTML = rest.map((u, i) => {
-      const me = u.id === String(currentUser.id);
-      return '<div class="lb-row' + (me?' me':'') + '"><div class="lb-pos">#' + (i+4) + '</div>'
-        + '<div class="lb-name">' + esc(u.name) + (me?' (you)':'') + '</div>'
-        + '<div class="lb-score">' + formatNum(u.balance) + '</div></div>';
-    }).join('') || '<div class="empty-note">No other souls yet</div>';
+  const pinEl = document.getElementById('lb-pinned-user');
+  if (pinEl) pinEl.innerHTML = '';
+
+  DB.getAllUsersForLeaderboard(100).then(top100 => {
+    const myId = String(currentUser.id);
+    const meInTop100 = top100.find(u => u.id === myId);
+
+    /* Always fetch true global rank — cheap count query, scales to any user count */
+    const rankPromise = meInTop100
+      ? Promise.resolve(top100.indexOf(meInTop100) + 1)
+      : DB.getUserRank(myId, currentUser.balance);
+
+    rankPromise.then(myRank => {
+      /* ── Pinned user card at the very top ── */
+      if (pinEl) {
+        if (meInTop100) {
+          /* Already in top 100 — no separate pin card, their row gets a glow instead */
+          pinEl.innerHTML = '';
+        } else {
+          pinEl.innerHTML =
+            '<div class="lb-pinned-card">' +
+              '<div class="lb-pinned-pos">' + (myRank ? '#' + myRank : '—') + '</div>' +
+              '<div class="lb-pinned-name">' + esc(currentUser.name) + ' (you)</div>' +
+              '<div class="lb-pinned-score">' + formatNum(currentUser.balance) + '</div>' +
+            '</div>';
+        }
+      }
+
+      /* ── Top 3 podium ── */
+      const top3 = top100.slice(0, 3);
+      const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+      const rkC = ['r2','r1','r3'], rkB = ['b2','b1','b3'], medals = ['🥈','🥇','🥉'], nums = [2,1,3];
+      document.getElementById('lb-podium').innerHTML = order.map((u, p) => {
+        const me = u.id === myId;
+        return '<div class="podium-item' + (me ? ' me-glow' : '') + '"><div class="podium-av ' + rkC[p] + '">' + medals[p] + '<div class="podium-badge">' + nums[p] + '</div></div>'
+          + '<div class="podium-name">' + esc(u.name) + (me ? ' (you)' : '') + '</div><div class="podium-score">' + formatNum(u.balance) + '</div>'
+          + '<div class="podium-block ' + rkB[p] + '"></div></div>';
+      }).join('');
+
+      /* ── Ranks 4-100 ── */
+      const rest = top100.slice(3, 100);
+      document.getElementById('lb-list').innerHTML = rest.map((u, i) => {
+        const me = u.id === myId;
+        return '<div class="lb-row' + (me ? ' me' : '') + '"><div class="lb-pos">#' + (i+4) + '</div>'
+          + '<div class="lb-name">' + esc(u.name) + (me ? ' (you)' : '') + '</div>'
+          + '<div class="lb-score">' + formatNum(u.balance) + '</div></div>';
+      }).join('') || '<div class="empty-note">No other souls yet</div>';
+    });
   });
 }
 

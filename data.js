@@ -218,6 +218,21 @@ const DB = (function () {
     }).catch(() => []);
   }
 
+  /* getUserRank: returns the user's true global leaderboard position (1-indexed)
+     without pulling the whole users table. Counts how many non-banned users
+     have a strictly higher balance, then adds 1. Scales to any user count
+     since it's a single count=exact request, not a full table fetch. */
+  function getUserRank(uid, balance) {
+    return fetch(
+      SUPABASE_URL + '/rest/v1/users?select=tg_id&is_banned=eq.false&balance=gt.' + encodeURIComponent(balance),
+      { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, Prefer: 'count=exact', Range: '0-0' } }
+    ).then(r => {
+      const range = r.headers.get('content-range');
+      const higherCount = range ? (parseInt(range.split('/')[1], 10) || 0) : 0;
+      return higherCount + 1;
+    }).catch(() => null);
+  }
+
   function getAllUsersForAdmin(searchQuery) {
     let q = 'order=last_seen.desc&limit=200';
     if (searchQuery) {
@@ -899,7 +914,7 @@ const DB = (function () {
     normaliseUser,  /* exported so realtime payloads can be normalised without a DB round-trip */
     getUser, saveUser, createUser,
     findUserByIdOrUsername,
-    getAllUsersForLeaderboard, getAllUsersForAdmin,
+    getAllUsersForLeaderboard, getAllUsersForAdmin, getUserRank,
     getUserCount, banUser, unbanUser,
 
     getReferralsFor, addReferral, bumpReferralEarned,

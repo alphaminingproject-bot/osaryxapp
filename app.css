@@ -239,11 +239,21 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .podium-block { width:100%; border-radius:6px 6px 0 0; }
 .podium-block.b1 { height:50px; background:linear-gradient(180deg,rgba(240,180,41,0.18),var(--card2)); border:1px solid rgba(240,180,41,0.25); }
 .podium-block.b2, .podium-block.b3 { height:30px; background:var(--card2); border:1px solid var(--border); }
-.lb-row { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:11px 14px; display:flex; align-items:center; gap:10px; margin-bottom:7px; }
-.lb-row.me { border-color:var(--gold); background:var(--goldfade); }
+.lb-row { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:11px 14px; display:flex; align-items:center; gap:10px; margin-bottom:7px; transition:box-shadow 0.3s; }
+.lb-row.me { border-color:var(--gold); background:var(--goldfade); box-shadow:0 0 16px rgba(240,180,41,0.35), inset 0 0 12px rgba(240,180,41,0.08); }
 .lb-pos { font-size:11px; font-weight:bold; color:var(--gray); width:24px; }
 .lb-name { flex:1; font-size:11px; color:var(--white); }
 .lb-score { font-size:11px; font-weight:bold; color:var(--gold); }
+
+/* ── PINNED USER CARD (shown when user is NOT in top 100) ── */
+.lb-pinned-card { display:flex; align-items:center; gap:12px; background:linear-gradient(135deg, rgba(240,180,41,0.12), rgba(240,180,41,0.04)); border:1.5px solid var(--gold); border-radius:12px; padding:14px 16px; margin-bottom:16px; box-shadow:0 0 20px rgba(240,180,41,0.25); }
+.lb-pinned-pos { font-size:16px; font-weight:bold; color:var(--gold); min-width:44px; text-align:center; }
+.lb-pinned-name { flex:1; font-size:12px; font-weight:bold; color:var(--white); }
+.lb-pinned-score { font-size:13px; font-weight:bold; color:var(--gold); }
+
+/* ── PODIUM GLOW (top 3 self-highlight) ── */
+.podium-item.me-glow .podium-av { box-shadow:0 0 24px rgba(240,180,41,0.6), 0 0 48px rgba(240,180,41,0.3); }
+.podium-item.me-glow .podium-name { color:var(--gold); text-shadow:0 0 8px rgba(240,180,41,0.5); }
 
 /* REFERRALS */
 .ref-hero { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; text-align:center; margin-bottom:12px; }
