@@ -21,7 +21,7 @@ const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
 
-const PORT          = process.env.PORT              || 3000;
+const PORT          = process.env.PORT              || 3001;
 const ADMIN_PW      = process.env.ADMIN_PASSWORD    || '';
 const TOTP_SECRET   = process.env.TOTP_SECRET       || '';
 const SB_URL        = process.env.SUPABASE_URL      || '';
