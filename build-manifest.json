@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-07-01T07:30:17.207Z",
+  "builtAt": "2026-07-01T12:15:52.798Z",
   "tokenName": "OSARYX",
   "botUser": "OSARYXBot",
   "appName": "Osaryx",
@@ -13,6 +13,8 @@
     "admin.css",
     "schema.sql",
     "README.md",
-    "bot.js"
+    "bot.js",
+    "server.js",
+    "package.json"
   ]
 }

@@ -41,13 +41,16 @@ function doLogin() {
   if (!pw || !code) { err.style.display = 'block'; err.textContent = 'Enter password and authenticator code'; return; }
   btn.disabled = true; btn.textContent = 'VERIFYING...';
   err.style.display = 'none';
-  fetch(BOT_BACKEND_URL + '/admin-login', {
+
+  /* POST credentials to Node server — password and TOTP verified there,
+     never compared in browser code */
+  fetch('/api/admin-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: pw, totp: code })
   }).then(r => r.json()).then(data => {
     btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD';
-    if (data.error) { err.style.display = 'block'; err.textContent = data.error; return; }
+    if (!data.ok) { err.style.display = 'block'; err.textContent = data.error || 'Login failed'; return; }
     sessionToken = data.token;
     sessionStorage.setItem('admin_token', sessionToken);
     document.getElementById('login-screen').style.display = 'none';
@@ -55,7 +58,7 @@ function doLogin() {
     loadOverview(); startPolling();
   }).catch(() => {
     btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD';
-    err.style.display = 'block'; err.textContent = 'Network error — check your connection';
+    err.style.display = 'block'; err.textContent = 'Network error — is the server running?';
   });
 }
 
@@ -66,9 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const stored = sessionStorage.getItem('admin_token');
   if (!stored) return;
-  fetch(BOT_BACKEND_URL + '/admin-verify', { headers: { 'Authorization': 'Bearer ' + stored } })
+  fetch('/api/verify-session', { headers: { 'Authorization': 'Bearer ' + stored } })
     .then(r => r.json()).then(data => {
-      if (data.valid) {
+      if (data.ok) {
         sessionToken = stored;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
