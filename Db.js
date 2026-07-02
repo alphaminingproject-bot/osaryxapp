@@ -12,8 +12,8 @@
    Matches schema: OSARYX Supabase Schema v4 (Final Launch Build)
    ============================================================ */
 
-const SUPABASE_URL      = '%%https://pnvzcdipmazdhkjpaasf.supabase.co%%';
-const SUPABASE_ANON_KEY = '%%sb_publishable_Cim6Q3kudqrXUHCaGCg4nA_mW8a1sgb%%';
+const SUPABASE_URL      = 'https://pnvzcdipmazdhkjpaasf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Cim6Q3kudqrXUHCaGCg4nA_mW8a1sgb';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
