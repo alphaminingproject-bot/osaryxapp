@@ -42,9 +42,7 @@ function doLogin() {
   btn.disabled = true; btn.textContent = 'VERIFYING...';
   err.style.display = 'none';
 
-  /* POST credentials to Node server — password and TOTP verified there,
-     never compared in browser code */
-  fetch('/api/admin-login', {
+  fetch(BOT_BACKEND_URL + '/admin-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: pw, totp: code })
@@ -58,7 +56,7 @@ function doLogin() {
     loadOverview(); startPolling();
   }).catch(() => {
     btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD';
-    err.style.display = 'block'; err.textContent = 'Network error — is the server running?';
+    err.style.display = 'block'; err.textContent = 'Network error — check BOT_BACKEND_URL in .env';
   });
 }
 
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const stored = sessionStorage.getItem('admin_token');
   if (!stored) return;
-  fetch('/api/verify-session', { headers: { 'Authorization': 'Bearer ' + stored } })
+  fetch(BOT_BACKEND_URL + '/admin-verify', { headers: { 'Authorization': 'Bearer ' + stored } })
     .then(r => r.json()).then(data => {
       if (data.ok) {
         sessionToken = stored;
