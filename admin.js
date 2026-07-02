@@ -48,8 +48,9 @@ function doLogin() {
     body: JSON.stringify({ password: pw, totp: code })
   }).then(r => r.json()).then(data => {
     btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD';
-    if (!data.token) { err.style.display = 'block'; err.textContent = data.error || 'Login failed'; return; }
+    if (!data.ok) { err.style.display = 'block'; err.textContent = data.error || 'Login failed'; return; }
     sessionToken = data.token;
+    DB.setToken(sessionToken);
     sessionStorage.setItem('admin_token', sessionToken);
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
@@ -69,8 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!stored) return;
   fetch(BOT_BACKEND_URL + '/admin-verify', { headers: { 'Authorization': 'Bearer ' + stored } })
     .then(r => r.json()).then(data => {
-      if (data.valid) {
+      if (data.ok) {
         sessionToken = stored;
+        DB.setToken(sessionToken);
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         loadOverview(); startPolling();
