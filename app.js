@@ -135,9 +135,9 @@ function finishBoot(u) {
   applyAvatar();
   matureStakes();
   recalcMiningState();
-  /* Save once on boot — do NOT call updateAll() before this resolves */
-  _writing = true;
-  DB.saveUser(currentUser).finally(() => { _writing = false; });
+  /* Save once on boot — simple save, no write-lock needed at boot
+     since we just read fresh data from DB */
+  DB.saveUser(currentUser);
   updateDisplay();
   startCountdown();
   startStakeTimer();
@@ -183,9 +183,12 @@ function setupRealtimeSync() {
       if (fresh.isBanned && !currentUser.isBanned) { showBannedScreen(); return; }
 
       /* Preserve session-only state that lives only in memory */
+      /* Preserve in-flight task UI state but re-read completed from DB */
       fresh.taskStates     = currentUser.taskStates;
       fresh.taskHandles    = currentUser.taskHandles;
-      fresh.completedTasks = currentUser.completedTasks;
+      /* Keep completedTasks from memory — it only grows, never shrinks */
+      Object.assign(fresh.completedTasks || {}, currentUser.completedTasks);
+      fresh.completedTasks = Object.assign(fresh.completedTasks || {}, currentUser.completedTasks);
       /* Refresh vaults from DB so vault cancellations/fills show immediately */
       DB.getVaultsFor(fresh.id).then(vaults => {
         fresh.stakes = vaults;
@@ -254,8 +257,8 @@ function handleReferralParam(u) {
     if (!referrer) return;
     u.referredBy = referrerId;
     return DB.referralExists(referrerId, u.id).then(exists => {
-      if (exists) return persist(u);
-      return DB.addReferral(referrerId, u.id, u.name).then(() => persist(u));
+      if (exists) return DB.saveUser(u);
+      return DB.addReferral(referrerId, u.id, u.name).then(() => DB.saveUser(u));
     });
   }).catch(e => { console.error('handleReferralParam failed', e); });
 }
@@ -1166,8 +1169,8 @@ function buyNFT(nftId) {
         if (!fresh) { showToast('Could not verify balance', 'err'); return; }
         if (fresh.balance < nft.worth) {
           showToast('Insufficient essence — need ' + nft.worth + ' ' + CFG.TOKEN_NAME, 'err');
-          /* Undo the sold flag since we can't pay */
-          DB.setNFTDispatchStatus(nftId, null);
+          /* Undo the sold flag — patch back to unsold so other users can buy it */
+          DB.setNFTSoldUndo(nftId);
           currentUser.balance = fresh.balance; updateDisplay(); return;
         }
         fresh.balance       -= nft.worth;
@@ -1309,7 +1312,7 @@ function renderRefs() {
     const verified = refs.filter(r => r.status === 'verified').length;
     document.getElementById('ref-count').textContent  = refs.length;
     document.getElementById('ref-earned').textContent = '+' + (verified * CFG.REF_BONUS) + ' ' + CFG.TOKEN_NAME + ' channelled · +5% of all soul harvests';
-    const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + '?startapp=ref_' + currentUser.id;
+    const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + CFG.APP_NAME + '?startapp=ref_' + currentUser.id;
     document.getElementById('ref-link-box').textContent = link;
     document.getElementById('ref-list').innerHTML = refs.map(r =>
       '<div class="ref-item"><div class="ref-av">👤</div><div class="ref-user">'

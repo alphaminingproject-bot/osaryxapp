@@ -464,7 +464,7 @@ function addTask() {
   if (!name || !reward) { statusEl.className = 'totp-status err'; statusEl.textContent = 'Name and reward are required.'; return; }
   if (type !== 'watch_ad' && !target) { statusEl.className = 'totp-status err'; statusEl.textContent = 'Target is required.'; return; }
   if ((type === 'x_follow' || type === 'link') && target && !/^https?:\/\//i.test(target)) target = 'https://' + target;
-  const minOrder = type === 'auto_ref' ? (9000 + Date.now() % 1000) : type === 'watch_ad' ? -999999 : Date.now();
+  const minOrder = type === 'auto_ref' ? (9000 + Date.now() % 1000) : type === 'watch_ad' ? -999999 : -(Date.now());
   adminAction('add_task', { task: { id: 't_'+Date.now(), name, desc, reward, type, icon, target, xFollow: type==='x_follow', clickCap, sortOrder: minOrder } })
     .then(() => { statusEl.className = 'totp-status ok'; statusEl.textContent = 'Task added ✅'; clearTaskForm(); loadTasksAdmin(); })
     .catch(e => { statusEl.className = 'totp-status err'; statusEl.textContent = 'Failed: '+e.message; });

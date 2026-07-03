@@ -611,6 +611,10 @@ const DB = (function () {
     return SB.patch('nft_listings', 'id=eq.' + encodeURIComponent(nftId), { dispatch_status: status }).catch(() => {});
   }
 
+  function setNFTSoldUndo(nftId) {
+    return SB.patch('nft_listings', 'id=eq.' + encodeURIComponent(nftId), { sold: false, sold_to: null, sold_at: null, sold_expires_at: null, dispatch_status: null }).catch(() => {});
+  }
+
   /* ════════════════════════════════════════════
      OSARYX NFTS
   ════════════════════════════════════════════ */
@@ -937,7 +941,7 @@ const DB = (function () {
 
     getNFTListings, getOwnedNFTListings,
     createNFTListing, deleteNFTListing,
-    tryBuyNFT, setNFTDispatchStatus,
+    tryBuyNFT, setNFTDispatchStatus, setNFTSoldUndo,
 
     getOsaryxNFTs, getOwnedOsaryxNFTs,
     createOsaryxNFT, deleteOsaryxNFT, tryBuyOsaryxNFT,
