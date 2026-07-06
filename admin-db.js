@@ -5,7 +5,7 @@
    Injected placeholder: https://snappy-wren-4059.alphaminingproject-bot.deno.net
    ============================================================ */
 
-const ADMIN_DB_URL = 'https://osaryxgggr.onrender.com';
+const ADMIN_DB_URL = 'https://osaryx-admin-api.onrender.com';
 
 const DB = (function () {
 
