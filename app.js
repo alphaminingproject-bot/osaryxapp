@@ -17,10 +17,10 @@ const CFG = {
   TOKEN_NAME:    'OSARYX',
   BOT_USERNAME:  'OSARYXBot',
   APP_NAME:      'Osaryx',
-  MINE_REWARD:   300,
+  MINE_REWARD:   100,
   REF_PERCENT:   0.05,
   REF_BONUS:     100,
-  REF_THRESHOLD: 100,
+  REF_THRESHOLD: 500,
 
   SHADOW_COST: 1000,
   SHADOW_MULT: 2,
@@ -34,8 +34,8 @@ const CFG = {
   STORAGE_DAYS:     3,
 
   STAKE_MIN:  1000,
-  STAKE_DAYS: 1,
-  NFT_SOLD_VISIBLE_MINUTES: 5
+  STAKE_DAYS: 7,
+  NFT_SOLD_VISIBLE_MINUTES: 30
 };
 
 let currentUser = null;
@@ -146,6 +146,14 @@ function finishBoot(u) {
   setupSwipeNav();
   setupRealtimeSync();
   DB.notifyAppOpen(currentUser.id);
+  /* Load Zeus price from backend and update display */
+  DB.getTonConfig().then(cfg => {
+    const starsPrice = cfg.stars_price || cfg.zeus_stars_price || 150;
+    const priceEl = document.getElementById('zeus-price-display');
+    const starsBtn = document.getElementById('zeus-stars-btn');
+    if (priceEl) priceEl.textContent = starsPrice + ' ⭐ Stars or TON';
+    if (starsBtn) starsBtn.textContent = '⭐ Pay ' + starsPrice + ' Stars';
+  }).catch(() => {});
 }
 
 function applyAvatar() {
@@ -184,11 +192,18 @@ function setupRealtimeSync() {
 
       /* Preserve session-only state that lives only in memory */
       /* Preserve in-flight task UI state but re-read completed from DB */
-      fresh.taskStates     = currentUser.taskStates;
-      fresh.taskHandles    = currentUser.taskHandles;
-      /* Keep completedTasks from memory — it only grows, never shrinks */
-      Object.assign(fresh.completedTasks || {}, currentUser.completedTasks);
-      fresh.completedTasks = Object.assign(fresh.completedTasks || {}, currentUser.completedTasks);
+      /* Merge task states — keep local UI state unless remote has newer completion */
+      fresh.taskStates  = currentUser.taskStates;
+      fresh.taskHandles = currentUser.taskHandles;
+      /* completedTasks only grows — merge both so approvals from admin show instantly */
+      const mergedCompleted = Object.assign({}, currentUser.completedTasks, fresh.completedTasks || {});
+      /* For any task that is now completed, clear its pending/verify UI state */
+      Object.keys(mergedCompleted).forEach(taskId => {
+        if (mergedCompleted[taskId] && fresh.taskStates[taskId] === 'pending') {
+          delete fresh.taskStates[taskId];
+        }
+      });
+      fresh.completedTasks = mergedCompleted;
       /* Refresh vaults from DB so vault cancellations/fills show immediately */
       DB.getVaultsFor(fresh.id).then(vaults => {
         fresh.stakes = vaults;

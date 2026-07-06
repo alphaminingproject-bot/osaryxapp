@@ -5,7 +5,7 @@
    Injected placeholder: https://snappy-wren-4059.alphaminingproject-bot.deno.net
    ============================================================ */
 
-const ADMIN_DB_URL = 'https://snappy-wren-4059.alphaminingproject-bot.deno.net';
+const ADMIN_DB_URL = 'https://osaryxgggr.onrender.com';
 
 const DB = (function () {
 
@@ -40,7 +40,7 @@ const DB = (function () {
     };
   }
 
-  const MAX_SUPPLY = 10000000000;
+  const MAX_SUPPLY = 23000000;
 
   function getAllUsersForLeaderboard(limit) { return query('users_leaderboard?limit='+(limit||100)).then(r=>r.map(normaliseUser)).catch(()=>[]); }
   function getAllUsersForAdmin(search)      { return query('users_admin'+(search?'?q='+encodeURIComponent(search):'')).then(r=>r.map(normaliseUser)).catch(()=>[]); }
@@ -52,9 +52,18 @@ const DB = (function () {
   function findTransaction(txnId)          { return query('txn_find?id='+encodeURIComponent(txnId)).catch(()=>null); }
   function getGlobalStats()                { return query('global_stats').then(r=>({totalMined:parseFloat(r.total_mined||0)})).catch(()=>({totalMined:0})); }
   function getMaintenanceStatus()          { return query('maintenance').then(r=>({isActive:r.is_active,message:r.message||''})).catch(()=>({isActive:false,message:''})); }
-  function getTasks()                      { return query('tasks').catch(()=>[]); }
-  function getAllTasksForAdmin()            { return query('tasks').catch(()=>[]); }
-  function getEvents()                     { return query('events').then(r=>r.map(ev=>({id:ev.id,name:ev.name,icon:ev.icon,desc:ev.description,reward:parseFloat(ev.reward||0),expiresAt:ev.expires_at,tasks:typeof ev.tasks==='string'?JSON.parse(ev.tasks||'[]'):(ev.tasks||[])}))).catch(()=>[]); }
+  function normTask(r) {
+    return { id: r.id, name: r.name, desc: r.description||'', reward: r.reward, type: r.task_type, icon: r.icon||'🎯', target: r.target||'', xFollow: r.x_follow||false, autoRef: r.auto_ref||null, sortOrder: r.sort_order||0, clickCap: r.click_cap||null, clickCount: r.click_count||0 };
+  }
+  function getTasks()             { return query('tasks').then(r=>r.map(normTask)).catch(()=>[]); }
+  function getAllTasksForAdmin()   { return query('tasks').then(r=>r.map(normTask)).catch(()=>[]); }
+  function getEvents() {
+    return query('events').then(r => r.map(ev => ({
+      id: ev.id, name: ev.name, icon: ev.icon||'📣', desc: ev.description||'',
+      reward: parseFloat(ev.reward||0), expiresAt: ev.expires_at||null, createdAt: ev.created_at,
+      tasks: typeof ev.tasks === 'string' ? JSON.parse(ev.tasks||'[]') : (ev.tasks||[])
+    }))).catch(()=>[]);
+  }
   function getRefQueue()                   { return query('ref_queue').then(r=>r.map(x=>({id:x.id,referrerId:x.referrer_id,referrerName:x.referrer_name,refereeId:x.referee_id,refereeName:x.referee_name,ts:x.ts,status:x.queue_status}))).catch(()=>[]); }
   function getXQueue()                     { return query('x_queue').then(r=>r.map(x=>({id:x.id,userId:x.tg_user_id,userName:x.user_name,taskId:x.task_id,taskName:x.task_name,reward:x.reward,handle:x.x_handle,ts:x.ts,status:x.queue_status}))).catch(()=>[]); }
   function getNFTListings()                { return query('nft_listings').then(r=>r.map(x=>({id:x.id,name:x.name,img:x.img,chain:x.chain,worth:parseFloat(x.worth||0),sold:x.sold,soldTo:x.sold_to,dispatchStatus:x.dispatch_status}))).catch(()=>[]); }

@@ -9,8 +9,9 @@
 const SUPABASE_URL    = 'https://pnvzcdipmazdhkjpaasf.supabase.co';
 const SUPABASE_ANON   = 'sb_publishable_Cim6Q3kudqrXUHCaGCg4nA_mW8a1sgb';
 const TOKEN_NAME       = 'OSARYX';
-const MAX_SUPPLY       = 10000000000;
+const MAX_SUPPLY       = 23000000;
 const BOT_BACKEND_URL  = 'https://snappy-wren-4059.alphaminingproject-bot.deno.net';
+const MEMBER_CHECK_URL = 'https://osaryhhhhhf.deno.dev';  /* URL of the separate member-check-bot on Deno Deploy */
 
 const SB = (function () {
   const BASE = SUPABASE_URL + '/rest/v1';
@@ -797,8 +798,9 @@ const DB = (function () {
      TELEGRAM MEMBERSHIP CHECK
   ════════════════════════════════════════════ */
   function checkTelegramMembership(userId, chatId) {
-    if (!BOT_BACKEND_URL) return Promise.resolve({ isMember: true, error: null });
-    return fetch(BOT_BACKEND_URL + '/check-member?user_id=' + encodeURIComponent(userId) + '&chat_id=' + encodeURIComponent(chatId))
+    const baseUrl = MEMBER_CHECK_URL || BOT_BACKEND_URL;
+    if (!baseUrl) return Promise.resolve({ isMember: true, error: null });
+    return fetch(baseUrl + '/check-member?user_id=' + encodeURIComponent(userId) + '&chat_id=' + encodeURIComponent(chatId))
       .then(r => r.json())
       .then(d => ({ isMember: d.is_member === true, error: d.error || null }))
       .catch(e => { console.error('checkTelegramMembership failed', e); return { isMember: false, error: String(e) }; });
