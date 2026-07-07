@@ -34,8 +34,8 @@ const CFG = {
   STORAGE_DAYS:     3,
 
   STAKE_MIN:  1000,
-  STAKE_DAYS: 7,
-  NFT_SOLD_VISIBLE_MINUTES: 30
+  STAKE_DAYS: 1,
+  NFT_SOLD_VISIBLE_MINUTES: 10
 };
 
 let currentUser = null;
@@ -679,7 +679,7 @@ function doStake() {
       .then(vaults => {
         currentUser.stakes = vaults;
         renderStakes();
-        showToast('⚖ ' + amt + ' consecrated. Yield in 7 days: +' + yld, 'suc');
+        showToast('⚖ ' + amt + ' consecrated. Yield in ' + CFG.STAKE_DAYS + ' days: +' + yld, 'suc');
       });
   }).finally(() => {
     stakeInFlight = false;

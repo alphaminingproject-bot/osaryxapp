@@ -3,7 +3,7 @@
    No secrets in browser. All writes through bot backend.
    ============================================================ */
 
-const BOT_BACKEND_URL = 'https://snappy-wren-4059.alphaminingproject-bot.deno.net';
+const ADMIN_API_URL   = 'https://osaryx-admin-api.onrender.com';
 const POLL_INTERVAL   = 20000;
 
 let sessionToken          = null;
@@ -14,7 +14,7 @@ let pendingOsaryxNFTReqId = null;
 
 async function adminAction(action, params = {}) {
   if (!sessionToken) { adminToast('Session expired — please log in again', 'err'); showLoginScreen(); throw new Error('No session'); }
-  const res = await fetch(BOT_BACKEND_URL + '/admin-action', {
+  const res = await fetch(ADMIN_API_URL + '/admin-action', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessionToken },
     body: JSON.stringify({ action, ...params })
@@ -42,7 +42,7 @@ function doLogin() {
   btn.disabled = true; btn.textContent = 'VERIFYING...';
   err.style.display = 'none';
 
-  fetch(BOT_BACKEND_URL + '/admin-login', {
+  fetch(ADMIN_API_URL + '/admin-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: pw, totp: code })
@@ -57,7 +57,7 @@ function doLogin() {
     loadOverview(); startPolling();
   }).catch(() => {
     btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD';
-    err.style.display = 'block'; err.textContent = 'Network error — check BOT_BACKEND_URL in .env';
+    err.style.display = 'block'; err.textContent = 'Network error — check ADMIN_API_URL in .env';
   });
 }
 
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const stored = sessionStorage.getItem('admin_token');
   if (!stored) return;
-  fetch(BOT_BACKEND_URL + '/admin-verify', { headers: { 'Authorization': 'Bearer ' + stored } })
+  fetch(ADMIN_API_URL + '/admin-verify', { headers: { 'Authorization': 'Bearer ' + stored } })
     .then(r => r.json()).then(data => {
       if (data.ok) {
         sessionToken = stored;
@@ -441,11 +441,22 @@ function openTaskDetailModal(taskId, taskName) {
   document.getElementById('task-detail-sub').textContent = 'Loading...';
   document.getElementById('task-click-log-table').innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:14px;">Loading...</td></tr>';
   document.getElementById('modal-task-detail').classList.add('show');
-  DB.getTaskClickLog(taskId).then(clicks => {
-    document.getElementById('task-detail-sub').textContent = clicks.length + ' raw EMBARK clicks';
+
+  Promise.all([DB.getTaskClickLog(taskId), DB.getAllTasksForAdmin()]).then(([clicks, allTasks]) => {
+    const task = allTasks.find(t => t.id === taskId);
+    const clickCount = task ? (task.clickCount || 0) : 0;
+    const clickCap   = task ? task.clickCap : null;
+    const capLine    = clickCap != null
+      ? clickCount + ' / ' + clickCap + ' successful completions'
+      : clickCount + ' successful completions, no cap set';
+    document.getElementById('task-detail-sub').innerHTML =
+      '<b style="color:var(--gold)">' + clicks.length + '</b> raw EMBARK clicks &nbsp;·&nbsp; ' + capLine;
     document.getElementById('task-click-log-table').innerHTML = clicks.map(c =>
-      '<tr><td>'+esc(c.userName||'')+'</td><td style="color:var(--gray)">'+esc(c.userId)+'</td><td style="color:var(--gray)">'+new Date(c.ts).toLocaleString()+'</td></tr>'
-    ).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:14px;">No clicks yet</td></tr>';
+      '<tr><td>' + esc(c.userName||'') + '</td><td style="color:var(--gray)">' + esc(c.userId) + '</td><td style="color:var(--gray)">' + new Date(c.ts).toLocaleString() + '</td></tr>'
+    ).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:14px;">No clicks recorded yet</td></tr>';
+  }).catch(e => {
+    console.error('openTaskDetailModal failed', e);
+    document.getElementById('task-click-log-table').innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--red);padding:14px;">Error loading data</td></tr>';
   });
 }
 function closeTaskDetailModal() { document.getElementById('modal-task-detail').classList.remove('show'); }
@@ -464,7 +475,14 @@ function addTask() {
   if (!name || !reward) { statusEl.className = 'totp-status err'; statusEl.textContent = 'Name and reward are required.'; return; }
   if (type !== 'watch_ad' && !target) { statusEl.className = 'totp-status err'; statusEl.textContent = 'Target is required.'; return; }
   if ((type === 'x_follow' || type === 'link') && target && !/^https?:\/\//i.test(target)) target = 'https://' + target;
-  const minOrder = type === 'auto_ref' ? (9000 + Date.now() % 1000) : type === 'watch_ad' ? -999999 : -(Date.now());
+  /* Sort order strategy:
+     watch_ad  = -999999 (always first)
+     new tasks = 1 to 99 (near top, above default channel/X tasks at 100+)
+     auto_ref  = 9000+   (always last)
+  */
+  const minOrder = type === 'auto_ref'  ? (9000 + Date.now() % 1000)
+                 : type === 'watch_ad'  ? -999999
+                 : 1;
   adminAction('add_task', { task: { id: 't_'+Date.now(), name, desc, reward, type, icon, target, xFollow: type==='x_follow', clickCap, sortOrder: minOrder } })
     .then(() => { statusEl.className = 'totp-status ok'; statusEl.textContent = 'Task added ✅'; clearTaskForm(); loadTasksAdmin(); })
     .catch(e => { statusEl.className = 'totp-status err'; statusEl.textContent = 'Failed: '+e.message; });

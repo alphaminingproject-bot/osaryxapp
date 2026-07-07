@@ -173,7 +173,7 @@
           <div class="zeus-card-body">
             <div class="zeus-card-name">Zeus, God of Lightning</div>
             <div class="zeus-card-desc">10× mining speed · 7 days · accrues automatically, no claiming</div>
-            <div class="zeus-card-price">150 ⭐ Stars or TON</div>
+            <div class="zeus-card-price" id="zeus-price-display">20 ⭐ Stars or TON</div>
           </div>
         </div>
 
@@ -340,7 +340,7 @@
   <div class="modal-box">
     <div class="modal-title">⚡ Awaken Zeus</div>
     <div class="modal-chain-note">10× mining for 7 days. Choose your offering:</div>
-    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()">⭐ Pay 150 Stars</button>
+    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">⭐ Pay 20 Stars</button>
     <button class="modal-ok" style="background:linear-gradient(135deg,#0d4fd6,#1a6fff);margin-bottom:8px;" onclick="payZeusWithTon()">💎 Pay with TON</button>
     <button class="modal-cancel" onclick="closeModal('modal-zeus')">CANCEL</button>
   </div>
