@@ -197,9 +197,9 @@ function setupRealtimeSync() {
       fresh.taskHandles = currentUser.taskHandles;
       /* completedTasks only grows — merge both so approvals from admin show instantly */
       const mergedCompleted = Object.assign({}, currentUser.completedTasks, fresh.completedTasks || {});
-      /* For any task that is now completed, clear its pending/verify UI state */
+      /* For any task now completed, clear pending/verify UI state */
       Object.keys(mergedCompleted).forEach(taskId => {
-        if (mergedCompleted[taskId] && fresh.taskStates[taskId] === 'pending') {
+        if (mergedCompleted[taskId] && (fresh.taskStates[taskId] === 'pending' || fresh.taskStates[taskId] === 'verify')) {
           delete fresh.taskStates[taskId];
         }
       });
@@ -850,11 +850,14 @@ function verifyEventTask(evId, taskId, target, type) {
 }
 
 function markEventTaskDone(evId, taskId) {
+  const isCheck = taskId === '__check__';
   const taskKey = 'ev_' + evId + '_' + taskId;
-  if (currentUser.completedTasks[taskKey]) return;
-  currentUser.completedTasks[taskKey] = true;
-  delete currentUser.taskStates[taskKey];
-  showToast('Task completed ✅', 'suc');
+  if (!isCheck) {
+    if (currentUser.completedTasks[taskKey]) return;
+    currentUser.completedTasks[taskKey] = true;
+    delete currentUser.taskStates[taskKey];
+    showToast('Task completed ✅', 'suc');
+  }
 
   DB.getEvents().then(events => {
     const ev = events.find(e => e.id === evId);
@@ -913,13 +916,26 @@ function submitEventXHandle(evId, taskId, taskName) {
       userName: currentUser.name,
       taskId:   taskKey,
       taskName: (ev ? ev.name + ' — ' : '') + taskName,
-      reward:   ev ? ev.reward : 0,   /* full event reward, not per-subtask */
+      reward:   0,  /* event subtasks never credit reward directly — markEventTaskDone handles it */
       handle,
       ts: Date.now()
     });
     showToast('Submitted! Awaiting judgment.', 'suc');
     openEventModal(evId);
   });
+}
+
+/* Called after realtime update — checks if any in-progress event just had
+   its final task approved by admin, and credits the reward if so */
+function checkEventCompletionAfterApproval() {
+  DB.getEvents().then(events => {
+    events.forEach(ev => {
+      if (currentUser.completedTasks['event_' + ev.id]) return; /* already rewarded */
+      if (!ev.tasks || !ev.tasks.length) return;
+      const allDone = ev.tasks.every(t => !!currentUser.completedTasks['ev_' + ev.id + '_' + t.id]);
+      if (allDone) markEventTaskDone(ev.id, '__check__'); /* triggers reward path */
+    });
+  }).catch(() => {});
 }
 
 function closeEventModal() { closeModal('modal-event'); currentEventId = null; }
@@ -980,12 +996,15 @@ function buildTaskCard(task) {
 
 /* Navigate to task link without changing task state — used by icon click */
 function goTaskLink(type, target) {
-  if (type === 'telegram_channel' || type === 'telegram_group') {
-    const ch = target.replace('@','');
-    if (tg) tg.openTelegramLink('https://t.me/' + ch); else window.open('https://t.me/' + ch, '_blank');
+  if (!target) return;
+  if (type === 'telegram_channel' || type === 'telegram_group' || target.startsWith('@')) {
+    const ch = target.replace('@', '');
+    if (tg) tg.openTelegramLink('https://t.me/' + ch);
+    else window.open('https://t.me/' + ch, '_blank');
   } else {
     const absUrl = ensureAbsoluteUrl(target);
-    if (tg) tg.openLink(absUrl); else window.open(absUrl, '_blank');
+    if (tg) tg.openLink(absUrl);
+    else window.open(absUrl, '_blank');
   }
 }
 

@@ -10,6 +10,7 @@
      SUPABASE_KEY       = your SERVICE ROLE key
      ADMIN_PASSWORD     = your chosen admin password
      TOTP_SECRET        = base32 TOTP secret
+     BOT_BACKEND_URL    = https://your-main-bot.deno.dev  (for pinging notifications)
      PORT               = (Render sets this automatically)
 
    How it connects to a new server after expiry:
@@ -28,6 +29,7 @@ const app  = express();
 const PORT = process.env.PORT || 3001;
 
 const SUPABASE_URL   = process.env.SUPABASE_URL   || '';
+const BOT_BACKEND_URL = process.env.BOT_BACKEND_URL || '';  /* Deno bot URL — for pinging process-notifications */
 const SUPABASE_KEY   = process.env.SUPABASE_KEY   || '';  /* service role */
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const TOTP_SECRET    = process.env.TOTP_SECRET    || '';
@@ -36,19 +38,33 @@ if (!SUPABASE_URL || !SUPABASE_KEY) console.error('⚠  SUPABASE_URL / SUPABASE_
 if (!ADMIN_PASSWORD)                console.error('⚠  ADMIN_PASSWORD not set');
 if (!TOTP_SECRET)                   console.error('⚠  TOTP_SECRET not set');
 
-/* ── Session store ── */
-const SESSIONS    = new Map(); /* token → expiry ms */
-const SESSION_TTL = 8 * 3600 * 1000; /* 8 hours */
+/* ── Session tokens (HMAC-signed, stateless) ──
+   Tokens are signed with HMAC-SHA256 using ADMIN_PASSWORD as the key.
+   No in-memory storage needed — valid on any Render instance/restart.
+   Format: base64(expiry_ms) . base64(hmac)
+── */
+const SESSION_TTL = 24 * 3600 * 1000; /* 24 hours */
 
-function genToken() { return crypto.randomBytes(32).toString('hex'); }
+function genToken() {
+  const expiry = Date.now() + SESSION_TTL;
+  const payload = String(expiry);
+  const sig = crypto.createHmac('sha256', ADMIN_PASSWORD).update(payload).digest('base64url');
+  return Buffer.from(payload).toString('base64url') + '.' + sig;
+}
 
 function validateSession(req) {
   const auth  = req.headers.authorization || '';
   const token = auth.replace('Bearer ', '').trim();
   if (!token) return false;
-  const exp = SESSIONS.get(token);
-  if (!exp || Date.now() > exp) { SESSIONS.delete(token); return false; }
-  return true;
+  try {
+    const [payloadB64, sig] = token.split('.');
+    if (!payloadB64 || !sig) return false;
+    const payload  = Buffer.from(payloadB64, 'base64url').toString();
+    const expected = crypto.createHmac('sha256', ADMIN_PASSWORD).update(payload).digest('base64url');
+    if (sig !== expected) return false;
+    const expiry = parseInt(payload, 10);
+    return Date.now() < expiry;
+  } catch (e) { return false; }
 }
 
 /* ── TOTP (RFC 6238, HMAC-SHA1, 30s step) ── */
@@ -139,6 +155,15 @@ async function sbCount(table, query) {
   return parseInt(range.split('/')[1] || '0', 10) || 0;
 }
 
+function pingBot() {
+  if (!BOT_BACKEND_URL) return;
+  const http  = require('http');
+  const https = require('https');
+  const url   = new URL(BOT_BACKEND_URL + '/process-notifications');
+  const mod   = url.protocol === 'https:' ? https : http;
+  mod.get(url.href).on('error', e => console.error('pingBot failed:', e.message));
+}
+
 function genTxnId(uid, amount) {
   const amtCents = Math.round(amount * 100);
   return 'TXN' + String(uid) + Date.now() + (amtCents < 0 ? '9' : '0') + Math.abs(amtCents);
@@ -168,7 +193,6 @@ app.post('/admin-login', (req, res) => {
   if (password !== ADMIN_PASSWORD)     return res.json({ ok: false, error: 'Incorrect password' });
   if (!verifyTotp(TOTP_SECRET, totp))  return res.json({ ok: false, error: 'Invalid authenticator code' });
   const token = genToken();
-  SESSIONS.set(token, Date.now() + SESSION_TTL);
   res.json({ ok: true, token });
 });
 
@@ -328,6 +352,7 @@ async function handleAction(action, p) {
 
     case 'send_message':
       await sbPost('admin_messages', { tg_user_id: String(p.uid), message: p.message, sent: false, ts: Date.now() });
+      pingBot();
       return { ok: true };
 
     case 'approve_ref': {
@@ -351,13 +376,28 @@ async function handleAction(action, p) {
 
     case 'approve_x': {
       await sbPatch('x_queue', `id=eq.${p.queue_row_id}`, { queue_status: 'verified', notified: false });
-      if (p.reward > 0) {
-        const rows = await sbGet('users', `tg_id=eq.${encodeURIComponent(p.uid)}`);
-        if (rows.length) {
-          const u            = rows[0];
-          const completed    = JSON.parse(u.completed_tasks || '{}');
-          const taskStates   = JSON.parse(u.task_states || '{}');
-          completed[p.task_id]  = true;
+      const rows = await sbGet('users', `tg_id=eq.${encodeURIComponent(p.uid)}`);
+      if (rows.length) {
+        const u          = rows[0];
+        const completed  = JSON.parse(u.completed_tasks || '{}');
+        const taskStates = JSON.parse(u.task_states || '{}');
+        const isEventTask = String(p.task_id).startsWith('ev_');
+        /* Mark the task completed in DB — app.js realtime will detect
+           this and call markEventTaskDone which checks if ALL event tasks
+           are done before crediting the full event reward */
+        completed[p.task_id]  = true;
+        /* Clear pending/verify state so button updates */
+        delete taskStates[p.task_id];
+        if (isEventTask) {
+          /* Event subtask — do NOT credit reward here.
+             The reward is paid by markEventTaskDone only when
+             every event task is complete. */
+          await sbPatch('users', `tg_id=eq.${encodeURIComponent(p.uid)}`, {
+            task_states: JSON.stringify(taskStates),
+            completed_tasks: JSON.stringify(completed)
+          });
+        } else if (p.reward > 0) {
+          /* Regular task — credit reward directly */
           taskStates[p.task_id] = 'done';
           const newBal = parseFloat(u.balance) + parseFloat(p.reward);
           await sbPatch('users', `tg_id=eq.${encodeURIComponent(p.uid)}`, { balance: newBal, task_states: JSON.stringify(taskStates), completed_tasks: JSON.stringify(completed) });
@@ -377,6 +417,7 @@ async function handleAction(action, p) {
         await sbPatch('users', `tg_id=eq.${encodeURIComponent(p.uid)}`, { task_states: JSON.stringify(taskStates) });
       }
       await sbPost('admin_messages', { tg_user_id: String(p.uid), message: '❌ Your quest submission was not verified. Tap the task icon to complete it again, then resubmit.', sent: false, ts: Date.now() });
+      pingBot();
       return { ok: true };
     }
 
@@ -388,6 +429,7 @@ async function handleAction(action, p) {
       await sbPatch('nft_listings', `id=eq.${encodeURIComponent(p.nft_id)}`, { dispatch_status: 'sent' });
       const req = r.body[0];
       await sbPost('admin_messages', { tg_user_id: req.tg_user_id, message: `✅ Your relic has been dispatched!\n\nNFT: ${req.nft_name||p.nft_id}\nTransaction ID: ${p.txn_id}`, sent: false, ts: Date.now() });
+      pingBot();
       return { ok: true };
     }
 
@@ -399,6 +441,7 @@ async function handleAction(action, p) {
       await sbPatch('osaryx_nfts', `id=eq.${encodeURIComponent(p.nft_id)}`, { dispatch_status: 'sent' });
       const req = r.body[0];
       await sbPost('admin_messages', { tg_user_id: req.tg_user_id, message: `✅ Your OSARYX NFT has been dispatched!\n\nSent: ${p.nft_name||req.nft_name||p.nft_id}\nTransaction ID: ${p.txn_id}`, sent: false, ts: Date.now() });
+      pingBot();
       return { ok: true };
     }
 
@@ -406,6 +449,7 @@ async function handleAction(action, p) {
       await sbPatch('epic_gods_requests', `id=eq.${p.req_id}`, { req_status: 'verified', verified_at: Date.now() });
       await sbPatch('users', `tg_id=eq.${encodeURIComponent(p.uid)}`, { zeus_active_until: Date.now()+7*86400000, zeus_started_at: Date.now(), zeus_settled_balance: 0 });
       await sbPost('admin_messages', { tg_user_id: String(p.uid), message: '⚡ Zeus, God of Lightning, has answered your call! 10× mining speed is now active for 7 days.', sent: false, ts: Date.now() });
+      pingBot();
       return { ok: true };
 
     case 'reject_epic_gods':

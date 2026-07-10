@@ -564,7 +564,8 @@ const DB = (function () {
   }
 
   function refQueueEntryExists(referrerId, refereeId) {
-    return SB.get('ref_queue', 'referrer_id=eq.' + encodeURIComponent(referrerId) + '&referee_id=eq.' + encodeURIComponent(refereeId)).then(rows => rows && rows.length > 0).catch(() => false);
+    return SB.get('ref_queue', 'referrer_id=eq.' + encodeURIComponent(referrerId) + '&referee_id=eq.' + encodeURIComponent(refereeId) + '&queue_status=neq.rejected')
+      .then(rows => rows && rows.length > 0).catch(() => false);
   }
 
   /* ════════════════════════════════════════════
