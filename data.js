@@ -534,7 +534,7 @@ const DB = (function () {
   function getXQueueFor(uid) {
     return SB.get('x_queue', 'tg_user_id=eq.' + encodeURIComponent(uid) + '&notified=eq.false&queue_status=neq.pending').then(rows => {
       if (!rows || rows.error) return [];
-      return rows.map(r => ({ id: r.id, userId: r.tg_user_id, taskName: r.task_name, reward: r.reward, status: r.queue_status }));
+      return rows.map(r => ({ id: r.id, userId: r.tg_user_id, taskId: r.task_id, taskName: r.task_name, reward: r.reward, status: r.queue_status }));
     }).catch(() => []);
   }
 

@@ -273,7 +273,21 @@ function handleReferralParam(u) {
     u.referredBy = referrerId;
     return DB.referralExists(referrerId, u.id).then(exists => {
       if (exists) return DB.saveUser(u);
-      return DB.addReferral(referrerId, u.id, u.name).then(() => DB.saveUser(u));
+      return DB.addReferral(referrerId, u.id, u.name).then(() => {
+        /* Push to ref_queue immediately on join so admin can verify right away */
+        return DB.refQueueEntryExists(referrerId, u.id).then(inQueue => {
+          if (!inQueue) {
+            DB.pushRefQueueItem({
+              referrerId: referrer.id,
+              referrerName: referrer.name,
+              refereeId: u.id,
+              refereeName: u.name,
+              ts: Date.now()
+            });
+          }
+          return DB.saveUser(u);
+        });
+      });
     });
   }).catch(e => { console.error('handleReferralParam failed', e); });
 }
@@ -341,11 +355,18 @@ function checkUserNotifications() {
     if (!items.length) return;
     let changed = false;
     items.forEach(item => {
+      const isEventTask = String(item.taskId || '').startsWith('ev_');
       if (item.status === 'verified') {
-        showToast('✅ Quest "' + item.taskName + '" verified! +' + item.reward + ' ' + CFG.TOKEN_NAME, 'suc');
+        /* Event subtask — no reward in the notification, just confirm done */
+        if (isEventTask || !item.reward || item.reward <= 0) {
+          showToast('Quest verified ✅', 'suc');
+        } else {
+          showToast('"' + item.taskName + '" verified! +' + item.reward + ' ' + CFG.TOKEN_NAME, 'suc');
+        }
+        /* For event tasks: trigger event completion check */
+        if (isEventTask) checkEventCompletionAfterApproval();
       } else if (item.status === 'rejected') {
-        showToast('❌ Quest "' + item.taskName + '" was not completed. Tap the task icon to redo it, then verify again.', 'err');
-        /* Write rejected state back so button flips from PENDING → VERIFY AGAIN */
+        showToast('Quest not verified. Tap icon to redo it.', 'err');
         if (currentUser.taskStates[item.taskId] === 'pending') {
           currentUser.taskStates[item.taskId] = 'rejected';
           changed = true;
@@ -357,13 +378,13 @@ function checkUserNotifications() {
   });
   DB.getNFTRequestsFor(currentUser.id).then(reqs => {
     reqs.forEach(req => {
-      showToast('Relic dispatched! ✅', 'suc');
+      showToast('Relic dispatched ✅', 'suc');
       DB.markNFTRequestNotified(req.reqId);
     });
   });
   DB.getOsaryxNFTRequestsFor(currentUser.id).then(reqs => {
     reqs.forEach(req => {
-      showToast('OSARYX NFT dispatched! ✅', 'suc');
+      showToast('OSARYX NFT dispatched ✅', 'suc');
       DB.markOsaryxNFTRequestNotified(req.reqId);
     });
   });
