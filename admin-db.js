@@ -40,7 +40,7 @@ const DB = (function () {
     };
   }
 
-  const MAX_SUPPLY = 23000000;
+  const MAX_SUPPLY = 2300000000;
 
   function getAllUsersForLeaderboard(limit) { return query('users_leaderboard?limit='+(limit||100)).then(r=>r.map(normaliseUser)).catch(()=>[]); }
   function getAllUsersForAdmin(search)      { return query('users_admin'+(search?'?q='+encodeURIComponent(search):'')).then(r=>r.map(normaliseUser)).catch(()=>[]); }

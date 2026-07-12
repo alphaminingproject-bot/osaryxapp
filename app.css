@@ -65,7 +65,15 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .empty-note { text-align:center; color:var(--gray); padding:30px 20px; font-size:11px; line-height:1.6; }
 
 /* HOME */
-.balance-block { text-align:center; padding:24px 0 14px; }
+.balance-block {
+  text-align: center;
+  padding: 0 0 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+}
 .balance-ring { width:170px; height:170px; margin:0 auto 18px; position:relative; display:flex; align-items:center; justify-content:center; }
 .balance-ring > svg { position:absolute; inset:0; width:100%; height:100%; }
 .balance-inner { z-index:1; text-align:center; position:relative; }
@@ -75,8 +83,32 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .mining-counter { margin-bottom:14px; }
 .mining-num { font-size:30px; font-weight:bold; color:var(--white); }
 .mining-label { font-size:9px; letter-spacing:3px; color:var(--gold2); margin-top:2px; }
-.mine-btn { display:block; width:calc(100% - 28px); margin:0 auto 10px; padding:15px; background:linear-gradient(135deg,var(--gold2),var(--gold)); border:none; border-radius:12px; color:#000; font-family:var(--font); font-size:12px; font-weight:bold; letter-spacing:2px; cursor:pointer; box-shadow:0 0 24px var(--goldglow); }
-.mine-btn:active { transform:scale(0.98); }
+.mine-btn {
+  display: block;
+  width: auto;
+  min-width: 160px;
+  margin: 0 auto 10px;
+  padding: 13px 32px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #8b0000 25%, #c9922a 50%, #f0b429 70%, #c9922a 85%, #8b0000 100%);
+  background-size: 300% 300%;
+  border: 1px solid rgba(240,160,0,0.5);
+  border-radius: 30px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  animation: mineGradientShift 4s ease infinite;
+  box-shadow: 0 0 18px rgba(200,100,0,0.3), 0 4px 16px rgba(0,0,0,0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.mine-btn:active { transform:scale(0.95); box-shadow:0 0 8px rgba(200,100,0,0.2); }
+@keyframes mineGradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 .mine-timer { text-align:center; font-size:22px; font-weight:bold; color:var(--gold); letter-spacing:2px; margin-bottom:12px; }
 .convert-title { font-size:10px; letter-spacing:3px; color:var(--gold); margin-bottom:10px; }
 .convert-soon { font-size:20px; font-weight:bold; color:var(--gold); margin-bottom:6px; }
@@ -327,10 +359,44 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .ton-copy-btn { background:none; border:none; cursor:pointer; font-size:14px; }
 
 /* TOAST */
-.toast { position:fixed; bottom:78px; left:50%; transform:translateX(-50%) translateY(12px); background:rgba(6,12,40,0.97); color:var(--gold); border:1px solid rgba(26,111,255,0.4); padding:8px 16px; border-radius:8px; font-size:10px; font-weight:bold; letter-spacing:1px; opacity:0; transition:all 0.25s; z-index:300; pointer-events:none; max-width:80vw; text-align:center; box-shadow:0 4px 24px rgba(0,0,0,0.6), 0 0 12px rgba(26,111,255,0.2); }
+.toast {
+  position: fixed;
+  bottom: 78px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: linear-gradient(135deg, rgba(4,6,30,0.98), rgba(8,4,20,0.98));
+  color: rgba(160,200,255,0.95);
+  border: 1px solid rgba(40,80,200,0.5);
+  border-left: 3px solid #1a6fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 300;
+  pointer-events: none;
+  max-width: 80vw;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 16px rgba(26,111,255,0.15);
+  backdrop-filter: blur(8px);
+}
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-.toast.err { background:rgba(20,4,12,0.97); border-color:rgba(255,61,90,0.5); color:#ff6b7a; box-shadow:0 4px 24px rgba(0,0,0,0.6),0 0 12px rgba(255,61,90,0.2); }
-.toast.suc { background:rgba(4,12,30,0.97); border-color:rgba(26,111,255,0.5); color:#6ab4ff; box-shadow:0 4px 24px rgba(0,0,0,0.6),0 0 12px rgba(26,111,255,0.25); }
+.toast.err {
+  background: linear-gradient(135deg, rgba(25,2,8,0.98), rgba(15,2,6,0.98));
+  border-color: rgba(200,40,60,0.5);
+  border-left-color: #ff3d5a;
+  color: rgba(255,130,140,0.95);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 16px rgba(255,61,90,0.15);
+}
+.toast.suc {
+  background: linear-gradient(135deg, rgba(2,6,28,0.98), rgba(4,4,20,0.98));
+  border-color: rgba(26,100,255,0.6);
+  border-left-color: #1a6fff;
+  color: rgba(120,180,255,0.95);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 16px rgba(26,111,255,0.2);
+}
 
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-thumb { background:var(--goldborder); border-radius:2px; }
@@ -461,4 +527,114 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 @keyframes zeusFlicker {
   0%,100% { opacity:0.6; transform:scale(1); }
   50%      { opacity:1;   transform:scale(1.1); }
+}
+
+/* ── Convert block ── */
+.convert-wrap { background:rgba(10,6,20,0.8); border:1px solid rgba(240,180,41,0.12); border-radius:12px; padding:16px; margin-top:14px; text-align:center; }
+.convert-title { font-size:9px; letter-spacing:3px; color:var(--gray); margin-bottom:6px; }
+.convert-soon { font-size:16px; font-weight:bold; color:var(--gold); margin-bottom:4px; }
+.convert-sub { font-size:9px; color:var(--gray); letter-spacing:1px; }
+
+/* ── Zeus active sigil (pure CSS — no image dependency) ── */
+.zeus-active-sigil {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.zeus-sigil-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(80,160,255,0.4);
+}
+.zeus-sigil-ring.r1 { width:130px; height:130px; animation: zeusRingSpin 12s linear infinite; border-style: dashed; border-color: rgba(80,160,255,0.3); }
+.zeus-sigil-ring.r2 { width:100px; height:100px; animation: zeusRingSpin 8s linear infinite reverse; border-color: rgba(200,120,0,0.4); }
+.zeus-sigil-core {
+  font-size: 42px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 12px rgba(80,160,255,0.8)) drop-shadow(0 0 24px rgba(200,120,0,0.5));
+  animation: zeusCorePulse 2s ease-in-out infinite;
+}
+.zeus-sigil-bolt {
+  position: absolute;
+  width: 2px;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(80,160,255,0.9), transparent);
+  border-radius: 1px;
+  animation: zeusBoltFlash 2s ease-in-out infinite;
+}
+.zeus-sigil-bolt.b1 { top:8%; left:20%; transform:rotate(-25deg); animation-delay:0s; }
+.zeus-sigil-bolt.b2 { top:8%; right:20%; transform:rotate(25deg); animation-delay:0.5s; }
+.zeus-sigil-bolt.b3 { bottom:8%; left:22%; transform:rotate(25deg); animation-delay:1s; }
+.zeus-sigil-bolt.b4 { bottom:8%; right:22%; transform:rotate(-25deg); animation-delay:1.5s; }
+@keyframes zeusRingSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes zeusCorePulse {
+  0%,100% { transform:scale(1);   filter:drop-shadow(0 0 12px rgba(80,160,255,0.8)) drop-shadow(0 0 24px rgba(200,120,0,0.5)); }
+  50%      { transform:scale(1.1); filter:drop-shadow(0 0 22px rgba(80,160,255,1))   drop-shadow(0 0 40px rgba(200,120,0,0.8)); }
+}
+@keyframes zeusBoltFlash {
+  0%,100%{opacity:0} 10%,15%{opacity:1} 20%{opacity:0} 55%,60%{opacity:0.7} 65%{opacity:0}
+}
+
+/* ── Zeus mini card sigil ── */
+.zeus-mini-sigil {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #04081a, #0a1040);
+  border: 1px solid rgba(80,160,255,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(80,160,255,0.3), inset 0 0 14px rgba(26,80,200,0.2);
+}
+.zeus-mini-ring {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 1px dashed rgba(80,160,255,0.25);
+  animation: zeusRingSpin 10s linear infinite;
+}
+.zeus-mini-bolt {
+  font-size: 26px;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 6px rgba(80,160,255,0.8));
+  animation: zeusCorePulse 2.5s ease-in-out infinite;
+}
+
+/* ── Animated ring arc glow ── */
+#bal-arc { filter: drop-shadow(0 0 6px rgba(200,100,0,0.6)); }
+
+/* ── Task card pulse on load ── */
+.task-card {
+  animation: taskFadeIn 0.3s ease forwards;
+}
+@keyframes taskFadeIn {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Vault card shimmer ── */
+.stake-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(240,180,41,0.06), transparent);
+  animation: vaultShimmer 4s ease-in-out infinite;
+}
+.stake-card { position:relative; overflow:hidden; }
+@keyframes vaultShimmer {
+  0%   { left:-100%; }
+  50%  { left:150%; }
+  100% { left:150%; }
 }

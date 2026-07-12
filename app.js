@@ -34,7 +34,7 @@ const CFG = {
   STORAGE_DAYS:     3,
 
   STAKE_MIN:  1000,
-  STAKE_DAYS: 1,
+  STAKE_DAYS: 7,
   NFT_SOLD_VISIBLE_MINUTES: 10
 };
 

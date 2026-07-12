@@ -69,7 +69,7 @@
 
     <!-- HOME -->
     <div class="page active" id="page-home">
-      <div class="balance-block" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 120px);padding:0 0 20px;">
+      <div class="balance-block">
         <div id="normal-mine-block">
           <div class="balance-ring">
             <svg viewBox="0 0 160 160">
@@ -125,20 +125,29 @@
             <div class="mining-num" id="bal-num">0</div>
             <div class="mining-label">OSARYX MINING</div>
           </div>
-          <button class="mine-btn" id="mine-btn" style="display:none;" onclick="handleMine()">⚡ HARVEST OSARYX</button>
+          <button class="mine-btn" id="mine-btn" style="display:none;" onclick="handleMine()">⚡ HARVEST</button>
           <div class="mine-timer" id="mine-timer"></div>
         </div>
 
         <div id="zeus-active-block" style="display:none;text-align:center;">
-          <div class="zeus-active-img-wrap">
-            <img src="zeus.jpg" alt="Zeus" class="zeus-active-img"/>
-            <div class="zeus-active-lightning"></div>
+          <div class="zeus-active-sigil">
+            <div class="zeus-sigil-ring r1"></div>
+            <div class="zeus-sigil-ring r2"></div>
+            <div class="zeus-sigil-core">⚡</div>
+            <div class="zeus-sigil-bolt b1"></div>
+            <div class="zeus-sigil-bolt b2"></div>
+            <div class="zeus-sigil-bolt b3"></div>
+            <div class="zeus-sigil-bolt b4"></div>
           </div>
           <div class="zeus-time-left" id="zeus-time-left">7d 0h 0m remaining</div>
         </div>
+
+        <div class="convert-wrap">
+          <div class="convert-title">CONVERT</div>
+          <div class="convert-soon">🌙 COMING SOON</div>
+          <div class="convert-sub">OSARYX → GRAM conversion descends upon the realm</div>
+        </div>
       </div>
-
-
     </div>
 
     <!-- TASKS -->
@@ -161,12 +170,15 @@
         <div class="forge-section-title">⚡ EPIC GOD</div>
         <div class="zeus-card" onclick="openZeusModal()">
           <div class="zeus-card-art">
-            <img src="zeus.jpg" alt="Zeus" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid rgba(80,160,255,0.5);box-shadow:0 0 14px rgba(80,160,255,0.4),0 0 28px rgba(100,140,255,0.2);"/>
+            <div class="zeus-mini-sigil">
+              <div class="zeus-mini-ring"></div>
+              <div class="zeus-mini-bolt">⚡</div>
+            </div>
           </div>
           <div class="zeus-card-body">
             <div class="zeus-card-name">Zeus, God of Lightning</div>
             <div class="zeus-card-desc">10× mining speed · 7 days · accrues automatically, no claiming</div>
-            <div class="zeus-card-price" id="zeus-price-display">20 ⭐ Stars or TON</div>
+            <div class="zeus-card-price" id="zeus-price-display">1 ⭐ Stars or TON</div>
           </div>
         </div>
 
@@ -333,7 +345,7 @@
   <div class="modal-box">
     <div class="modal-title">⚡ Awaken Zeus</div>
     <div class="modal-chain-note">10× mining for 7 days. Choose your offering:</div>
-    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">⭐ Pay 20 Stars</button>
+    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">⭐ Pay 1 Stars</button>
     <button class="modal-ok" style="background:linear-gradient(135deg,#0d4fd6,#1a6fff);margin-bottom:8px;" onclick="payZeusWithTon()">💎 Pay with TON</button>
     <button class="modal-cancel" onclick="closeModal('modal-zeus')">CANCEL</button>
   </div>
