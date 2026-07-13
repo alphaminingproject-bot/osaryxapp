@@ -476,7 +476,7 @@ function tickCountdown() {
   const normalBlock = document.getElementById('normal-mine-block');
 
   if (isZeusActive()) {
-    zeusBlock.style.display   = 'block';
+    zeusBlock.style.display   = 'flex';
     normalBlock.style.display = 'none';
     const rem = currentUser.zeusActiveUntil - Date.now();
     const d = Math.floor(rem/86400000), h = Math.floor((rem%86400000)/3600000), m = Math.floor((rem%3600000)/60000);
