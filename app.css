@@ -637,6 +637,15 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   background: radial-gradient(ellipse at 50% 40%, rgba(200,210,220,0.18) 0%, rgba(120,140,160,0.08) 60%, transparent 100%);
   border-radius: 40% 40% 45% 45%;
   border: 1px solid rgba(180,200,255,0.15);
+  overflow: hidden;
+}
+.zf-god-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 5;
 }
 .zf-god-brow-l, .zf-god-brow-r {
   position: absolute;
