@@ -1410,7 +1410,7 @@ function renderRefs() {
     const verified = refs.filter(r => r.status === 'verified').length;
     document.getElementById('ref-count').textContent  = refs.length;
     document.getElementById('ref-earned').textContent = '+' + (verified * CFG.REF_BONUS) + ' ' + CFG.TOKEN_NAME + ' channelled · +5% of all soul harvests';
-    const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + CFG.APP_NAME + '?startapp=ref_' + currentUser.id;
+    const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + '?startapp=ref_' + currentUser.id;
     document.getElementById('ref-link-box').textContent = link;
     document.getElementById('ref-list').innerHTML = refs.map(r =>
       '<div class="ref-item"><div class="ref-av">👤</div><div class="ref-user">'
