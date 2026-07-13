@@ -50,6 +50,9 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .pages { flex:1; overflow:hidden; position:relative; touch-action: pan-y; }
 .page { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; padding:14px 14px 80px; display:none; }
 .page.active { display:block; animation:fadeUp 0.2s ease; }
+/* Home tab only: centered, non-scrolling layout — scoped to .active so it
+   never fights the tab-switcher's display:none when this tab isn't showing */
+#page-home.active { display:flex; flex-direction:column; overflow:hidden; padding-bottom:14px; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 
 /* NAV */
@@ -562,14 +565,20 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 /* ══════════════════════════════════════════
    ZEUS LIGHTNING FIELD
 ══════════════════════════════════════════ */
+#zeus-active-block {
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
 .zeus-field {
   position: relative;
   width: 100%;
-  height: 340px;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   margin-bottom: 10px;
   border-radius: 14px;
-  background: radial-gradient(ellipse 90% 78% at 50% 40%, #0a1230 0%, #050a1c 40%, var(--bg) 75%, var(--bg) 100%);
+  background: linear-gradient(180deg, #020414 0%, #04081e 60%, #010208 100%);
 }
 /* whole-sky flash — the ambient light every real strike throws off */
 .zeus-field::after {
@@ -579,14 +588,14 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   background: radial-gradient(ellipse at 50% 20%, rgba(160,205,255,0.55) 0%, rgba(90,150,255,0.15) 40%, transparent 75%);
   opacity: 0;
   pointer-events: none;
-  animation: skyFlash 4.4s ease-in-out infinite;
+  animation: skyFlash 2.2s ease-in-out infinite;
 }
 @keyframes skyFlash {
-  0%, 91%, 100% { opacity: 0; }
-  92%           { opacity: 0.9; }
-  92.6%         { opacity: 0.15; }
-  93.2%         { opacity: 0.7; }
-  94%           { opacity: 0; }
+  0%, 78%, 100% { opacity: 0; }
+  80%           { opacity: 0.9; }
+  82%           { opacity: 0.15; }
+  84%           { opacity: 0.7; }
+  87%           { opacity: 0; }
 }
 .zf-bolt {
   position: absolute;
@@ -597,14 +606,14 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   background: linear-gradient(180deg, #fff 0%, #cfe8ff 25%, #6fb0ff 60%, transparent 100%);
   clip-path: polygon(48% 0%, 58% 14%, 44% 20%, 62% 36%, 40% 42%, 66% 58%, 46% 64%, 100% 100%, 52% 70%, 70% 62%, 48% 48%, 68% 40%, 44% 26%, 60% 18%);
   filter: drop-shadow(0 0 4px #bfe0ff) drop-shadow(0 0 12px #4a8fff);
-  animation: boltStrike 3.6s ease-in-out infinite;
+  animation: boltStrike 2.2s ease-in-out infinite;
 }
 @keyframes boltStrike {
-  0%, 89%, 100% { opacity: 0; }
-  90%           { opacity: 1; }
-  90.6%         { opacity: 0.1; }
-  91.2%         { opacity: 0.9; }
-  92%           { opacity: 0; }
+  0%, 76%, 100% { opacity: 0; }
+  78%           { opacity: 1; }
+  79%           { opacity: 0.1; }
+  80%           { opacity: 0.9; }
+  82%           { opacity: 0; }
 }
 .zf-fork {
   position: absolute;
@@ -616,26 +625,130 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   clip-path: polygon(50% 0%, 62% 30%, 48% 34%, 100% 100%, 54% 60%, 66% 52%, 44% 20%);
   filter: drop-shadow(0 0 3px #bfe0ff) drop-shadow(0 0 8px #4a8fff);
   transform: rotate(14deg);
-  animation: boltStrike 3.6s ease-in-out infinite;
+  animation: boltStrike 2.2s ease-in-out infinite;
 }
-.zf-god-photo {
+.zf-god {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%);
+  width: 190px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 0 28px rgba(80,160,255,0.55));
+}
+.zf-god-glow {
+  position: absolute;
+  inset: -32px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(80,160,255,0.28) 0%, transparent 70%);
+  animation: godGlow 2.5s ease-in-out infinite;
+}
+@keyframes godGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.zf-god-hair {
+  width: 158px;
+  height: 78px;
+  background: linear-gradient(180deg, rgba(220,220,230,0.7) 0%, rgba(180,180,190,0.4) 60%, transparent 100%);
+  border-radius: 50% 50% 0 0;
+  margin-bottom: -32px;
+  filter: blur(1px);
+}
+.zf-god-face {
+  position: relative;
+  width: 126px;
+  height: 140px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(200,210,220,0.18) 0%, rgba(120,140,160,0.08) 60%, transparent 100%);
+  border-radius: 40% 40% 45% 45%;
+  border: 1px solid rgba(180,200,255,0.15);
+  overflow: hidden;
+}
+.zf-god-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  -webkit-mask-image: radial-gradient(ellipse 84% 88% at 50% 40%, #000 52%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.12) 88%, transparent 100%);
-  mask-image: radial-gradient(ellipse 84% 88% at 50% 40%, #000 52%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.12) 88%, transparent 100%);
-  filter: drop-shadow(0 0 30px rgba(80,150,255,0.35));
-  animation: godGlow 2.5s ease-in-out infinite;
-}
-@keyframes godGlow { 0%,100%{ filter: drop-shadow(0 0 22px rgba(80,150,255,0.3)); } 50%{ filter: drop-shadow(0 0 38px rgba(80,150,255,0.55)); } }
-.zf-god-img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  object-position: 50% 30%;
-  display: block;
+  z-index: 5;
 }
+.zf-god-brow-l, .zf-god-brow-r {
+  position: absolute;
+  top: 34px;
+  width: 34px;
+  height: 5px;
+  background: rgba(160,180,200,0.6);
+  border-radius: 2px;
+  animation: browsFlash 3s ease-in-out infinite;
+}
+.zf-god-brow-l { left: 16px; transform: rotate(-8deg); }
+.zf-god-brow-r { right: 16px; transform: rotate(8deg); }
+@keyframes browsFlash { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.zf-eye-l, .zf-eye-r {
+  position: absolute;
+  top: 46px;
+  width: 25px;
+  height: 15px;
+  background: rgba(80,160,255,0.25);
+  border-radius: 50%;
+  border: 1px solid rgba(80,160,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: eyeGlow 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(80,160,255,0.6);
+}
+.zf-eye-l { left: 19px; }
+.zf-eye-r { right: 19px; }
+.zf-pupil {
+  width: 11px;
+  height: 11px;
+  background: radial-gradient(circle, #fff 0%, #80d0ff 40%, #1a6fff 100%);
+  border-radius: 50%;
+}
+@keyframes eyeGlow { 0%,100%{box-shadow:0 0 8px rgba(80,160,255,0.6)} 50%{box-shadow:0 0 18px rgba(80,160,255,1),0 0 30px rgba(80,160,255,0.4)} }
+.zf-beard {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 94px;
+  height: 62px;
+  background: linear-gradient(180deg, rgba(200,210,220,0.25) 0%, rgba(160,170,180,0.1) 60%, transparent 100%);
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+}
+.zf-crown { position:relative; width:126px; height:44px; margin-top:-14px; }
+.zf-crown-b {
+  position: absolute;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, rgba(80,160,255,0.9), transparent);
+  border-radius: 2px;
+  animation: crownFlash 1.5s ease-in-out infinite;
+}
+.zf-crown-b.b1 { left:32px; height:42px; animation-delay:0s; }
+.zf-crown-b.b2 { left:60px; height:52px; animation-delay:0.3s; }
+.zf-crown-b.b3 { left:88px; height:34px; animation-delay:0.6s; }
+@keyframes crownFlash { 0%,100%{opacity:0.4;filter:blur(0)} 50%{opacity:1;filter:blur(0.5px)} }
+.zf-rune-ring {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 230px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(80,160,255,0.35);
+  box-shadow: 0 0 12px rgba(80,160,255,0.2), inset 0 0 12px rgba(80,160,255,0.1);
+  animation: runeRotate 8s linear infinite;
+}
+.zf-rune-inner {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px dashed rgba(80,160,255,0.2);
+}
+@keyframes runeRotate { from{box-shadow:0 0 12px rgba(80,160,255,0.2)} to{box-shadow:0 0 20px rgba(80,160,255,0.5)} }
 .zeus-time-left {
   font-size: 10px;
   letter-spacing: 3px;
