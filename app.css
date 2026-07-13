@@ -67,11 +67,14 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 /* HOME */
 .balance-block {
   text-align: center;
-  padding: 0 0 8px;
+  padding: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
+  align-items: stretch;
+  gap: 10px;
+  min-height: 0;
   overflow: hidden;
 }
 .balance-ring { width:170px; height:170px; margin:0 auto 18px; position:relative; display:flex; align-items:center; justify-content:center; }
@@ -562,78 +565,90 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 .zeus-field {
   position: relative;
   width: 100%;
-  height: 220px;
+  height: 260px;
   overflow: hidden;
   margin-bottom: 10px;
   border-radius: 14px;
   background: linear-gradient(180deg, #020414 0%, #04081e 60%, #010208 100%);
 }
+/* whole-sky flash — the ambient light every real strike throws off */
+.zeus-field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 20%, rgba(160,205,255,0.55) 0%, rgba(90,150,255,0.15) 40%, transparent 75%);
+  opacity: 0;
+  pointer-events: none;
+  animation: skyFlash 4.4s ease-in-out infinite;
+}
+@keyframes skyFlash {
+  0%, 91%, 100% { opacity: 0; }
+  92%           { opacity: 0.9; }
+  92.6%         { opacity: 0.15; }
+  93.2%         { opacity: 0.7; }
+  94%           { opacity: 0; }
+}
 .zf-bolt {
   position: absolute;
   top: 0;
-  width: 2px;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    rgba(80,160,255,0.9) 20%,
-    rgba(140,200,255,1) 50%,
-    rgba(80,160,255,0.6) 80%,
-    transparent 100%);
-  border-radius: 1px;
-  animation: boltFall 1.4s ease-in-out infinite;
-  filter: blur(0.5px);
-  box-shadow: 0 0 4px rgba(80,160,255,0.8), 0 0 10px rgba(60,120,255,0.4);
+  width: 16px;
+  height: 100%;
+  opacity: 0;
+  background: linear-gradient(180deg, #fff 0%, #cfe8ff 25%, #6fb0ff 60%, transparent 100%);
+  clip-path: polygon(48% 0%, 58% 14%, 44% 20%, 62% 36%, 40% 42%, 66% 58%, 46% 64%, 100% 100%, 52% 70%, 70% 62%, 48% 48%, 68% 40%, 44% 26%, 60% 18%);
+  filter: drop-shadow(0 0 4px #bfe0ff) drop-shadow(0 0 12px #4a8fff);
+  animation: boltStrike 3.6s ease-in-out infinite;
 }
-@keyframes boltFall {
-  0%   { transform:translateY(-100px); opacity:0; }
-  10%  { opacity:1; }
-  70%  { opacity:0.8; }
-  100% { transform:translateY(240px); opacity:0; }
+@keyframes boltStrike {
+  0%, 89%, 100% { opacity: 0; }
+  90%           { opacity: 1; }
+  90.6%         { opacity: 0.1; }
+  91.2%         { opacity: 0.9; }
+  92%           { opacity: 0; }
 }
 .zf-fork {
   position: absolute;
-  top: 30px;
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(180deg, rgba(120,180,255,0.8), transparent);
-  animation: forkFlash 1.8s ease-in-out infinite;
-  transform: rotate(18deg);
-  filter: blur(0.3px);
-}
-@keyframes forkFlash {
-  0%,60%,100% { opacity:0; }
-  20%,40%     { opacity:0.9; }
+  top: 24%;
+  width: 10px;
+  height: 46%;
+  opacity: 0;
+  background: linear-gradient(180deg, #dcefff 0%, #6fb0ff 70%, transparent 100%);
+  clip-path: polygon(50% 0%, 62% 30%, 48% 34%, 100% 100%, 54% 60%, 66% 52%, 44% 20%);
+  filter: drop-shadow(0 0 3px #bfe0ff) drop-shadow(0 0 8px #4a8fff);
+  transform: rotate(14deg);
+  animation: boltStrike 3.6s ease-in-out infinite;
 }
 .zf-god {
   position: absolute;
   left: 50%;
-  top: 10px;
+  top: 12px;
   transform: translateX(-50%);
-  width: 120px;
-  height: 160px;
+  width: 150px;
+  height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  filter: drop-shadow(0 0 20px rgba(80,160,255,0.5));
+  filter: drop-shadow(0 0 24px rgba(80,160,255,0.55));
 }
 .zf-god-glow {
   position: absolute;
-  inset: -20px;
-  background: radial-gradient(ellipse at 50% 40%, rgba(80,160,255,0.25) 0%, transparent 70%);
+  inset: -26px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(80,160,255,0.28) 0%, transparent 70%);
   animation: godGlow 2.5s ease-in-out infinite;
 }
 @keyframes godGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
 .zf-god-hair {
-  width: 100px;
-  height: 50px;
+  width: 125px;
+  height: 62px;
   background: linear-gradient(180deg, rgba(220,220,230,0.7) 0%, rgba(180,180,190,0.4) 60%, transparent 100%);
   border-radius: 50% 50% 0 0;
-  margin-bottom: -20px;
+  margin-bottom: -26px;
   filter: blur(1px);
 }
 .zf-god-face {
   position: relative;
-  width: 80px;
-  height: 90px;
+  width: 100px;
+  height: 112px;
   background: radial-gradient(ellipse at 50% 40%, rgba(200,210,220,0.18) 0%, rgba(120,140,160,0.08) 60%, transparent 100%);
   border-radius: 40% 40% 45% 45%;
   border: 1px solid rgba(180,200,255,0.15);
@@ -649,21 +664,21 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 }
 .zf-god-brow-l, .zf-god-brow-r {
   position: absolute;
-  top: 22px;
-  width: 22px;
-  height: 3px;
+  top: 27px;
+  width: 27px;
+  height: 4px;
   background: rgba(160,180,200,0.6);
   border-radius: 2px;
   animation: browsFlash 3s ease-in-out infinite;
 }
-.zf-god-brow-l { left: 10px; transform: rotate(-8deg); }
-.zf-god-brow-r { right: 10px; transform: rotate(8deg); }
+.zf-god-brow-l { left: 13px; transform: rotate(-8deg); }
+.zf-god-brow-r { right: 13px; transform: rotate(8deg); }
 @keyframes browsFlash { 0%,100%{opacity:0.5} 50%{opacity:1} }
 .zf-eye-l, .zf-eye-r {
   position: absolute;
-  top: 30px;
-  width: 16px;
-  height: 10px;
+  top: 37px;
+  width: 20px;
+  height: 12px;
   background: rgba(80,160,255,0.25);
   border-radius: 50%;
   border: 1px solid rgba(80,160,255,0.6);
@@ -673,11 +688,11 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   animation: eyeGlow 2s ease-in-out infinite;
   box-shadow: 0 0 8px rgba(80,160,255,0.6);
 }
-.zf-eye-l { left: 12px; }
-.zf-eye-r { right: 12px; }
+.zf-eye-l { left: 15px; }
+.zf-eye-r { right: 15px; }
 .zf-pupil {
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   background: radial-gradient(circle, #fff 0%, #80d0ff 40%, #1a6fff 100%);
   border-radius: 50%;
 }
@@ -687,32 +702,32 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 40px;
+  width: 75px;
+  height: 50px;
   background: linear-gradient(180deg, rgba(200,210,220,0.25) 0%, rgba(160,170,180,0.1) 60%, transparent 100%);
   border-radius: 0 0 50% 50%;
   filter: blur(1px);
 }
-.zf-crown { position:relative; width:80px; height:30px; margin-top:-10px; }
+.zf-crown { position:relative; width:100px; height:36px; margin-top:-12px; }
 .zf-crown-b {
   position: absolute;
   bottom: 0;
-  width: 3px;
+  width: 4px;
   background: linear-gradient(180deg, rgba(80,160,255,0.9), transparent);
   border-radius: 2px;
   animation: crownFlash 1.5s ease-in-out infinite;
 }
-.zf-crown-b.b1 { left:20px; height:28px; animation-delay:0s; }
-.zf-crown-b.b2 { left:38px; height:34px; animation-delay:0.3s; }
-.zf-crown-b.b3 { left:56px; height:22px; animation-delay:0.6s; }
+.zf-crown-b.b1 { left:25px; height:34px; animation-delay:0s; }
+.zf-crown-b.b2 { left:48px; height:42px; animation-delay:0.3s; }
+.zf-crown-b.b3 { left:71px; height:27px; animation-delay:0.6s; }
 @keyframes crownFlash { 0%,100%{opacity:0.4;filter:blur(0)} 50%{opacity:1;filter:blur(0.5px)} }
 .zf-rune-ring {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 200px;
-  height: 30px;
+  width: 230px;
+  height: 34px;
   border-radius: 50%;
   border: 1px solid rgba(80,160,255,0.35);
   box-shadow: 0 0 12px rgba(80,160,255,0.2), inset 0 0 12px rgba(80,160,255,0.1);
