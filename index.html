@@ -7,6 +7,44 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <link rel="stylesheet" href="app.css"/>
+  <!-- Monetag Interstitial SDK -->
+   <script src='//libtl.com/sdk.js' data-zone='11273712' data-sdk='show_11273712'></script>
+  <!-- Monetag interstitial scheduler: max 2 ads / 6 min, 30s between, 5s first delay -->
+  <script>
+    window.addEventListener('load', function() {
+      var _mtCount   = 0;
+      var _mtMax     = 2;
+      var _mtBetween = 30000;  /* 30s between ads */
+      var _mtFirst   = 5000;   /* 5s before first */
+
+      function showInterstitial() {
+        if (_mtCount >= _mtMax) return;
+        if (typeof show_11273712 !== 'function') return;
+        show_11273712({ type: 'preload' }).then(function() {
+          return show_11273712();
+        }).then(function() {
+          _mtCount++;
+          setTimeout(showInterstitial, _mtBetween);
+        }).catch(function() {});
+      }
+      setTimeout(showInterstitial, _mtFirst);
+
+      // One-time in-app disclosure, first launch only
+      try {
+        if (!localStorage.getItem('osaryx_ads_notice_seen')) {
+          localStorage.setItem('osaryx_ads_notice_seen', '1');
+          var n = document.createElement('div');
+          n.textContent = 'OSARYX shows occasional ads to support the platform.';
+          n.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));' +
+            'background:rgba(10,8,4,0.95);border:1px solid rgba(240,180,41,0.3);color:#e8d9b0;' +
+            'font-size:11px;padding:10px 14px;border-radius:10px;z-index:9999;text-align:center;' +
+            'font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+          document.body.appendChild(n);
+          setTimeout(function() { n.remove(); }, 4500);
+        }
+      } catch (e) {}
+    });
+  </script>
 </head>
 <body>
 
@@ -68,7 +106,7 @@
   <div class="pages">
 
     <!-- HOME -->
-    <div class="page active" id="page-home">
+    <div class="page active" id="page-home" style="overflow:hidden;">
       <div class="balance-block">
         <div id="normal-mine-block">
           <div class="balance-ring">
@@ -129,23 +167,50 @@
           <div class="mine-timer" id="mine-timer"></div>
         </div>
 
-        <div id="zeus-active-block" style="display:none;text-align:center;">
-          <div class="zeus-active-sigil">
-            <div class="zeus-sigil-ring r1"></div>
-            <div class="zeus-sigil-ring r2"></div>
-            <div class="zeus-sigil-core">⚡</div>
-            <div class="zeus-sigil-bolt b1"></div>
-            <div class="zeus-sigil-bolt b2"></div>
-            <div class="zeus-sigil-bolt b3"></div>
-            <div class="zeus-sigil-bolt b4"></div>
+        <div id="zeus-active-block" style="display:none;">
+          <div class="zeus-field">
+            <div class="zf-bolt" style="left:8%;animation-delay:0s;height:60px;"></div>
+            <div class="zf-bolt" style="left:18%;animation-delay:0.3s;height:80px;"></div>
+            <div class="zf-bolt" style="left:29%;animation-delay:0.7s;height:50px;"></div>
+            <div class="zf-bolt" style="left:42%;animation-delay:0.1s;height:90px;"></div>
+            <div class="zf-bolt" style="left:55%;animation-delay:0.5s;height:65px;"></div>
+            <div class="zf-bolt" style="left:67%;animation-delay:0.9s;height:75px;"></div>
+            <div class="zf-bolt" style="left:78%;animation-delay:0.2s;height:55px;"></div>
+            <div class="zf-bolt" style="left:89%;animation-delay:0.6s;height:85px;"></div>
+            <div class="zf-fork" style="left:13%;animation-delay:0.4s;"></div>
+            <div class="zf-fork" style="left:36%;animation-delay:0.8s;"></div>
+            <div class="zf-fork" style="left:60%;animation-delay:0.15s;"></div>
+            <div class="zf-fork" style="left:83%;animation-delay:0.65s;"></div>
+            <div class="zf-god">
+              <div class="zf-god-glow"></div>
+              <div class="zf-god-face">
+                <div class="zf-god-hair"></div>
+                <div class="zf-god-brow-l"></div>
+                <div class="zf-god-brow-r"></div>
+                <div class="zf-eye-l"><div class="zf-pupil"></div></div>
+                <div class="zf-eye-r"><div class="zf-pupil"></div></div>
+                <div class="zf-beard"></div>
+              </div>
+              <div class="zf-crown">
+                <div class="zf-crown-b b1"></div>
+                <div class="zf-crown-b b2"></div>
+                <div class="zf-crown-b b3"></div>
+              </div>
+            </div>
+            <div class="zf-rune-ring">
+              <div class="zf-rune-inner"></div>
+            </div>
           </div>
           <div class="zeus-time-left" id="zeus-time-left">7d 0h 0m remaining</div>
         </div>
 
         <div class="convert-wrap">
-          <div class="convert-title">CONVERT</div>
-          <div class="convert-soon">🌙 COMING SOON</div>
-          <div class="convert-sub">OSARYX → GRAM conversion descends upon the realm</div>
+          <div class="convert-inner">
+            <div class="convert-glow"></div>
+            <div class="convert-title">CONVERT</div>
+            <div class="convert-soon">🌙 COMING SOON</div>
+            <div class="convert-sub">OSARYX → GRAM · The final alchemy descends</div>
+          </div>
         </div>
       </div>
     </div>
@@ -281,7 +346,7 @@
       </div>
       <div class="ref-link-card">
         <div class="ref-link-label">YOUR INVOCATION SCROLL</div>
-        <div class="ref-link-box" id="ref-link-box">...</div>
+        <div class="ref-link-box" id="ref-link-box" onclick="copyRefLink()" style="cursor:pointer;" title="Tap to copy">...</div>
         <button class="copy-btn" onclick="copyRefLink()">📋 COPY SCROLL</button>
         <button class="share-btn" onclick="shareRefLink()">↗ DISPATCH VIA TELEGRAM</button>
       </div>

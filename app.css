@@ -67,12 +67,12 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
 /* HOME */
 .balance-block {
   text-align: center;
-  padding: 0 0 14px;
+  padding: 0 0 8px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: calc(100vh - 120px);
+  justify-content: space-evenly;
+  overflow: hidden;
 }
 .balance-ring { width:170px; height:170px; margin:0 auto 18px; position:relative; display:flex; align-items:center; justify-content:center; }
 .balance-ring > svg { position:absolute; inset:0; width:100%; height:100%; }
@@ -110,9 +110,6 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   100% { background-position: 0% 50%; }
 }
 .mine-timer { text-align:center; font-size:22px; font-weight:bold; color:var(--gold); letter-spacing:2px; margin-bottom:12px; }
-.convert-title { font-size:10px; letter-spacing:3px; color:var(--gold); margin-bottom:10px; }
-.convert-soon { font-size:20px; font-weight:bold; color:var(--gold); margin-bottom:6px; }
-.convert-sub { font-size:10px; color:var(--gray); }
 
 /* ZEUS */
 .zeus-card { display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,#0a0420,#1a0010); border:1px solid rgba(120,80,255,0.4); border-radius:16px; padding:16px; margin-bottom:18px; cursor:pointer; box-shadow:0 0 26px rgba(80,40,255,0.18); position:relative; overflow:hidden; }
@@ -491,94 +488,15 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   50%,55%  { opacity:0.7; } 60% { opacity:0; }
 }
 
-/* ── Zeus active image ── */
-.zeus-active-img-wrap {
-  position: relative;
-  width: 160px;
-  height: 160px;
-  margin: 0 auto 12px;
-  border-radius: 16px;
-  overflow: hidden;
-}
-.zeus-active-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 16px;
-  border: 1px solid rgba(80,160,255,0.5);
-  box-shadow: 0 0 30px rgba(80,160,255,0.4), 0 0 60px rgba(26,111,255,0.2);
-}
-.zeus-active-lightning {
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(80,160,255,0.25) 0%, transparent 60%);
-  animation: zeusPulse 2.5s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes zeusPulse {
-  0%,100% { opacity:0.4; }
-  50%      { opacity:1; }
-}
-@keyframes zeusSpin {
-  from { transform:rotate(0deg); }
-  to   { transform:rotate(360deg); }
-}
-@keyframes zeusFlicker {
-  0%,100% { opacity:0.6; transform:scale(1); }
-  50%      { opacity:1;   transform:scale(1.1); }
-}
-
 /* ── Convert block ── */
-.convert-wrap { background:rgba(10,6,20,0.8); border:1px solid rgba(240,180,41,0.12); border-radius:12px; padding:16px; margin-top:14px; text-align:center; }
-.convert-title { font-size:9px; letter-spacing:3px; color:var(--gray); margin-bottom:6px; }
-.convert-soon { font-size:16px; font-weight:bold; color:var(--gold); margin-bottom:4px; }
-.convert-sub { font-size:9px; color:var(--gray); letter-spacing:1px; }
-
-/* ── Zeus active sigil (pure CSS — no image dependency) ── */
-.zeus-active-sigil {
-  position: relative;
-  width: 130px;
-  height: 130px;
-  margin: 0 auto 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.zeus-sigil-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(80,160,255,0.4);
-}
-.zeus-sigil-ring.r1 { width:130px; height:130px; animation: zeusRingSpin 12s linear infinite; border-style: dashed; border-color: rgba(80,160,255,0.3); }
-.zeus-sigil-ring.r2 { width:100px; height:100px; animation: zeusRingSpin 8s linear infinite reverse; border-color: rgba(200,120,0,0.4); }
-.zeus-sigil-core {
-  font-size: 42px;
-  position: relative;
-  z-index: 2;
-  filter: drop-shadow(0 0 12px rgba(80,160,255,0.8)) drop-shadow(0 0 24px rgba(200,120,0,0.5));
-  animation: zeusCorePulse 2s ease-in-out infinite;
-}
-.zeus-sigil-bolt {
-  position: absolute;
-  width: 2px;
-  height: 28px;
-  background: linear-gradient(to bottom, rgba(80,160,255,0.9), transparent);
-  border-radius: 1px;
-  animation: zeusBoltFlash 2s ease-in-out infinite;
-}
-.zeus-sigil-bolt.b1 { top:8%; left:20%; transform:rotate(-25deg); animation-delay:0s; }
-.zeus-sigil-bolt.b2 { top:8%; right:20%; transform:rotate(25deg); animation-delay:0.5s; }
-.zeus-sigil-bolt.b3 { bottom:8%; left:22%; transform:rotate(25deg); animation-delay:1s; }
-.zeus-sigil-bolt.b4 { bottom:8%; right:22%; transform:rotate(-25deg); animation-delay:1.5s; }
-@keyframes zeusRingSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-@keyframes zeusCorePulse {
-  0%,100% { transform:scale(1);   filter:drop-shadow(0 0 12px rgba(80,160,255,0.8)) drop-shadow(0 0 24px rgba(200,120,0,0.5)); }
-  50%      { transform:scale(1.1); filter:drop-shadow(0 0 22px rgba(80,160,255,1))   drop-shadow(0 0 40px rgba(200,120,0,0.8)); }
-}
-@keyframes zeusBoltFlash {
-  0%,100%{opacity:0} 10%,15%{opacity:1} 20%{opacity:0} 55%,60%{opacity:0.7} 65%{opacity:0}
-}
+.convert-wrap { margin-top:12px; padding:2px; border-radius:14px; background:linear-gradient(135deg,rgba(26,111,255,0.3),rgba(139,26,26,0.3),rgba(26,111,255,0.3)); }
+.convert-inner { position:relative; background:linear-gradient(135deg,rgba(4,6,24,0.97),rgba(8,4,18,0.97)); border-radius:13px; padding:14px 16px; overflow:hidden; text-align:center; }
+.convert-glow { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(26,111,255,0.15) 0%,transparent 70%); pointer-events:none; animation:convertPulse 3s ease-in-out infinite; }
+@keyframes convertPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+.convert-title { font-size:8px; letter-spacing:4px; color:rgba(100,140,255,0.6); margin-bottom:6px; font-family:var(--font); }
+.convert-soon { font-size:15px; font-weight:bold; background:linear-gradient(90deg,#1a6fff,#8b0000,#f0b429,#1a6fff); background-size:200%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:convertShift 4s linear infinite; margin-bottom:4px; letter-spacing:3px; font-family:var(--font); }
+@keyframes convertShift { 0%{background-position:0%} 100%{background-position:200%} }
+.convert-sub { font-size:9px; color:rgba(100,140,200,0.55); letter-spacing:1px; }
 
 /* ── Zeus mini card sigil ── */
 .zeus-mini-sigil {
@@ -637,4 +555,172 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   0%   { left:-100%; }
   50%  { left:150%; }
   100% { left:150%; }
+}
+/* ══════════════════════════════════════════
+   ZEUS LIGHTNING FIELD
+══════════════════════════════════════════ */
+.zeus-field {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #020414 0%, #04081e 60%, #010208 100%);
+}
+.zf-bolt {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(80,160,255,0.9) 20%,
+    rgba(140,200,255,1) 50%,
+    rgba(80,160,255,0.6) 80%,
+    transparent 100%);
+  border-radius: 1px;
+  animation: boltFall 1.4s ease-in-out infinite;
+  filter: blur(0.5px);
+  box-shadow: 0 0 4px rgba(80,160,255,0.8), 0 0 10px rgba(60,120,255,0.4);
+}
+@keyframes boltFall {
+  0%   { transform:translateY(-100px); opacity:0; }
+  10%  { opacity:1; }
+  70%  { opacity:0.8; }
+  100% { transform:translateY(240px); opacity:0; }
+}
+.zf-fork {
+  position: absolute;
+  top: 30px;
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(120,180,255,0.8), transparent);
+  animation: forkFlash 1.8s ease-in-out infinite;
+  transform: rotate(18deg);
+  filter: blur(0.3px);
+}
+@keyframes forkFlash {
+  0%,60%,100% { opacity:0; }
+  20%,40%     { opacity:0.9; }
+}
+.zf-god {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 0 20px rgba(80,160,255,0.5));
+}
+.zf-god-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(80,160,255,0.25) 0%, transparent 70%);
+  animation: godGlow 2.5s ease-in-out infinite;
+}
+@keyframes godGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.zf-god-hair {
+  width: 100px;
+  height: 50px;
+  background: linear-gradient(180deg, rgba(220,220,230,0.7) 0%, rgba(180,180,190,0.4) 60%, transparent 100%);
+  border-radius: 50% 50% 0 0;
+  margin-bottom: -20px;
+  filter: blur(1px);
+}
+.zf-god-face {
+  position: relative;
+  width: 80px;
+  height: 90px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(200,210,220,0.18) 0%, rgba(120,140,160,0.08) 60%, transparent 100%);
+  border-radius: 40% 40% 45% 45%;
+  border: 1px solid rgba(180,200,255,0.15);
+}
+.zf-god-brow-l, .zf-god-brow-r {
+  position: absolute;
+  top: 22px;
+  width: 22px;
+  height: 3px;
+  background: rgba(160,180,200,0.6);
+  border-radius: 2px;
+  animation: browsFlash 3s ease-in-out infinite;
+}
+.zf-god-brow-l { left: 10px; transform: rotate(-8deg); }
+.zf-god-brow-r { right: 10px; transform: rotate(8deg); }
+@keyframes browsFlash { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.zf-eye-l, .zf-eye-r {
+  position: absolute;
+  top: 30px;
+  width: 16px;
+  height: 10px;
+  background: rgba(80,160,255,0.25);
+  border-radius: 50%;
+  border: 1px solid rgba(80,160,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: eyeGlow 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(80,160,255,0.6);
+}
+.zf-eye-l { left: 12px; }
+.zf-eye-r { right: 12px; }
+.zf-pupil {
+  width: 7px;
+  height: 7px;
+  background: radial-gradient(circle, #fff 0%, #80d0ff 40%, #1a6fff 100%);
+  border-radius: 50%;
+}
+@keyframes eyeGlow { 0%,100%{box-shadow:0 0 8px rgba(80,160,255,0.6)} 50%{box-shadow:0 0 18px rgba(80,160,255,1),0 0 30px rgba(80,160,255,0.4)} }
+.zf-beard {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(200,210,220,0.25) 0%, rgba(160,170,180,0.1) 60%, transparent 100%);
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+}
+.zf-crown { position:relative; width:80px; height:30px; margin-top:-10px; }
+.zf-crown-b {
+  position: absolute;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, rgba(80,160,255,0.9), transparent);
+  border-radius: 2px;
+  animation: crownFlash 1.5s ease-in-out infinite;
+}
+.zf-crown-b.b1 { left:20px; height:28px; animation-delay:0s; }
+.zf-crown-b.b2 { left:38px; height:34px; animation-delay:0.3s; }
+.zf-crown-b.b3 { left:56px; height:22px; animation-delay:0.6s; }
+@keyframes crownFlash { 0%,100%{opacity:0.4;filter:blur(0)} 50%{opacity:1;filter:blur(0.5px)} }
+.zf-rune-ring {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(80,160,255,0.35);
+  box-shadow: 0 0 12px rgba(80,160,255,0.2), inset 0 0 12px rgba(80,160,255,0.1);
+  animation: runeRotate 8s linear infinite;
+}
+.zf-rune-inner {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px dashed rgba(80,160,255,0.2);
+}
+@keyframes runeRotate { from{box-shadow:0 0 12px rgba(80,160,255,0.2)} to{box-shadow:0 0 20px rgba(80,160,255,0.5)} }
+.zeus-time-left {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(100,160,255,0.8);
+  text-align: center;
+  font-family: var(--font);
+  padding: 4px 0 6px;
 }

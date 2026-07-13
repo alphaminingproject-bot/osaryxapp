@@ -35,7 +35,9 @@ const CFG = {
 
   STAKE_MIN:  1000,
   STAKE_DAYS: 7,
-  NFT_SOLD_VISIBLE_MINUTES: 10
+  NFT_SOLD_VISIBLE_MINUTES: 10,
+
+  REF_AD_REWARD: 20   /* credited when a user watches the rewarded ad from the referral tab */
 };
 
 let currentUser = null;
@@ -1161,10 +1163,51 @@ function submitZeusTonTxn() {
 }
 
 /* ══════════════════════════════════════════════
-   WATCH AD
+   WATCH AD (Monetag rewarded interstitial — zone 11273712)
+   Reward is only credited inside the .then() callback, i.e.
+   only after Monetag confirms the ad was actually watched.
 ══════════════════════════════════════════════ */
+let _adInFlight = false;
+
 function watchAdForReward(taskId, reward) {
-  showToast('This quest is temporarily unavailable', 'err');
+  if (_adInFlight) return;
+  if (typeof show_11273712 !== 'function') { showToast('Ad not ready — try again shortly', 'err'); return; }
+
+  const cooldownKey = 'osaryx_ad_cd_' + taskId;
+  const last = Number(localStorage.getItem(cooldownKey) || 0);
+  if (Date.now() - last < 60000) { showToast('Give it a moment before the next viewing', 'err'); return; }
+
+  _adInFlight = true;
+  show_11273712().then(() => {
+    localStorage.setItem(cooldownKey, String(Date.now()));
+    return creditAdReward(reward, 'Ad watched: ' + taskId);
+  }).catch(() => {
+    showToast('Ad could not be shown — try again', 'err');
+  }).finally(() => {
+    _adInFlight = false;
+  });
+}
+
+/* Shared reward-crediting path for any Monetag placement.
+   Always re-reads balance fresh from DB before crediting, same
+   pattern as verifyTelegramTask, so concurrent credits can't clobber. */
+function creditAdReward(reward, description) {
+  return DB.getUser(currentUser.id).then(fresh => {
+    if (!fresh) return;
+    fresh.completedTasks = currentUser.completedTasks;
+    fresh.taskStates     = currentUser.taskStates;
+    fresh.taskHandles    = currentUser.taskHandles;
+    fresh.stakes          = currentUser.stakes;
+    fresh.balance        += reward;
+    currentUser = fresh;
+
+    DB.logTransaction(currentUser.id, currentUser.name, 'watch_ad', description, reward, currentUser.balance);
+    DB.addToTotalMined(reward);
+    updateDisplay();
+    renderTasks();
+    showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' — ad reward claimed ✅', 'suc');
+    return persist(currentUser);
+  });
 }
 
 /* ══════════════════════════════════════════════
@@ -1385,6 +1428,23 @@ function copyRefLink() {
   try { document.execCommand('copy'); } catch(e){}
   document.body.removeChild(el);
   showToast('Invocation scroll copied ✅', 'suc');
+  maybeShowRefAd();
+}
+
+/* Rewarded ad tied to the referral tab — fires on copy, capped to
+   once per hour so the same link can't be re-copied for infinite reward. */
+function maybeShowRefAd() {
+  if (_adInFlight) return;
+  if (typeof show_11273712 !== 'function') return;
+  const cooldownKey = 'osaryx_ref_ad_cd';
+  const last = Number(localStorage.getItem(cooldownKey) || 0);
+  if (Date.now() - last < 3600000) return;
+
+  _adInFlight = true;
+  show_11273712().then(() => {
+    localStorage.setItem(cooldownKey, String(Date.now()));
+    return creditAdReward(CFG.REF_AD_REWARD, 'Ad watched: referral tab');
+  }).catch(() => {}).finally(() => { _adInFlight = false; });
 }
 
 function shareRefLink() {
