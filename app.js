@@ -880,6 +880,7 @@ function markEventTaskDone(evId, taskId) {
     currentUser.completedTasks[taskKey] = true;
     delete currentUser.taskStates[taskKey];
     showToast('Task completed ✅', 'suc');
+    DB.logTaskClick(taskKey, currentUser.id, currentUser.name);   /* NEW */
   }
 
   DB.getEvents().then(events => {
