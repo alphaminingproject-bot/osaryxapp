@@ -10,7 +10,7 @@
   <!-- Monetag Interstitial SDK -->
   <script src='//libtl.com/sdk.js' data-zone='11273712' data-sdk='show_11273712'></script>
   <!-- Monetag interstitial scheduler: max 2 ads / 6 min, 30s between, 5s first delay -->
-  <script>
+  <!-- <script>
     window.addEventListener('load', function() {
       var _mtCount   = 0;
       var _mtMax     = 2;
@@ -44,7 +44,7 @@
         }
       } catch (e) {}
     });
-  </script>
+  </script> -->
 </head>
 <body>
 
@@ -168,44 +168,24 @@
         </div>
 
         <div id="zeus-active-block" style="display:none;">
-          <div class="zeus-field">
-            <div class="zf-bolt" style="left:10%;animation-delay:0s;"></div>
-            <div class="zf-bolt" style="left:82%;animation-delay:0.55s;"></div>
-            <div class="zf-bolt" style="left:34%;animation-delay:1.1s;"></div>
-            <div class="zf-bolt" style="left:60%;animation-delay:1.65s;"></div>
-            <div class="zf-fork" style="left:18%;animation-delay:0s;"></div>
-            <div class="zf-fork" style="left:88%;animation-delay:0.55s;"></div>
-            <div class="zf-fork" style="left:40%;animation-delay:1.1s;"></div>
-            <div class="zf-fork" style="left:66%;animation-delay:1.65s;"></div>
-            <div class="zf-god">
-              <div class="zf-god-glow"></div>
-              <div class="zf-god-face">
-                <img class="zf-god-img" src="zeus.png" alt="" onerror="this.style.display='none'"/>
-                <div class="zf-god-hair"></div>
-                <div class="zf-god-brow-l"></div>
-                <div class="zf-god-brow-r"></div>
-                <div class="zf-eye-l"><div class="zf-pupil"></div></div>
-                <div class="zf-eye-r"><div class="zf-pupil"></div></div>
-                <div class="zf-beard"></div>
-              </div>
-              <div class="zf-crown">
-                <div class="zf-crown-b b1"></div>
-                <div class="zf-crown-b b2"></div>
-                <div class="zf-crown-b b3"></div>
+          <div class="zeus-active-wrap">
+            <div class="zeus-mini-field">
+              <div class="zf-god-photo-mini">
+                <img class="zf-god-img-mini" src="zeus.png" alt="Zeus" onerror="this.parentElement.style.display='none'"/>
               </div>
             </div>
-            <div class="zf-rune-ring">
-              <div class="zf-rune-inner"></div>
+            <div class="zeus-active-info">
+              <div class="zeus-active-title">ZEUS ACTIVE</div>
+              <div class="zeus-time-left" id="zeus-time-left">7d 0h 0m remaining</div>
             </div>
           </div>
-          <div class="zeus-time-left" id="zeus-time-left">7d 0h 0m remaining</div>
         </div>
 
         <div class="convert-wrap">
           <div class="convert-inner">
             <div class="convert-glow"></div>
             <div class="convert-title">CONVERT</div>
-            <div class="convert-soon">🌙 COMING SOON</div>
+            <div class="convert-soon">COMING SOON</div>
             <div class="convert-sub">OSARYX → GRAM · The final alchemy descends</div>
           </div>
         </div>
@@ -240,7 +220,7 @@
           <div class="zeus-card-body">
             <div class="zeus-card-name">Zeus, God of Lightning</div>
             <div class="zeus-card-desc">10× mining speed · 7 days · accrues automatically, no claiming</div>
-            <div class="zeus-card-price" id="zeus-price-display">1 ⭐ Stars or TON</div>
+            <div class="zeus-card-price" id="zeus-price-display">1 ✦ Stars or TON</div>
           </div>
         </div>
 
@@ -318,11 +298,11 @@
     <div class="page" id="page-road">
       <div class="sec-title">✦ THE PROPHECY</div>
       <div class="roadmap">
-        <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">🚀 The Awakening</div><div class="rm-sub">OSARYX Token airdrop descends</div></div></div>
+        <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">The Awakening</div><div class="rm-sub">OSARYX Token airdrop descends</div></div></div>
         <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">⚖ The Eternal Vault</div><div class="rm-sub">Staking ritual unlocked</div></div></div>
-        <div class="rm-item"><div class="rm-dot current"></div><div><div class="rm-name">🖼 The Mystic Reliquary</div><div class="rm-sub">Exclusive NFT artefacts forge their forms</div></div></div>
-        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">💱 The Grand Transmutation</div><div class="rm-sub">OSARYX → GRAM — the final alchemy</div></div></div>
-        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">🌐 The Ascension</div><div class="rm-sub">OSARYX listed across exchanges</div></div></div>
+        <div class="rm-item"><div class="rm-dot current"></div><div><div class="rm-name">The Mystic Reliquary</div><div class="rm-sub">Exclusive NFT artefacts forge their forms</div></div></div>
+        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">The Grand Transmutation</div><div class="rm-sub">OSARYX → GRAM — the final alchemy</div></div></div>
+        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">The Ascension</div><div class="rm-sub">OSARYX listed across exchanges</div></div></div>
       </div>
     </div>
 
@@ -344,8 +324,8 @@
       <div class="ref-link-card">
         <div class="ref-link-label">YOUR INVOCATION SCROLL</div>
         <div class="ref-link-box" id="ref-link-box" onclick="copyRefLink()" style="cursor:pointer;" title="Tap to copy">...</div>
-        <button class="copy-btn" onclick="copyRefLink()">📋 COPY SCROLL</button>
-        <button class="share-btn" onclick="shareRefLink()">↗ DISPATCH VIA TELEGRAM</button>
+        <button class="copy-btn" onclick="copyRefLink()">COPY SCROLL</button>
+        <button class="share-btn" onclick="shareRefLink()">DISPATCH VIA TELEGRAM</button>
       </div>
       <div class="sec-title">✦ INVOKED SOULS</div>
       <div id="ref-list"></div>
@@ -382,7 +362,7 @@
 </div>
 
 <div class="overlay" id="overlay-history">
-  <div class="overlay-header"><div class="overlay-title">⏱ Sacred Ledger</div><button class="overlay-close" onclick="closeOverlay('overlay-history')">✕</button></div>
+  <div class="overlay-header"><div class="overlay-title">Sacred Ledger</div><button class="overlay-close" onclick="closeOverlay('overlay-history')">✕</button></div>
   <div class="overlay-body" id="history-body"></div>
 </div>
 
@@ -407,18 +387,18 @@
   <div class="modal-box">
     <div class="modal-title">⚡ Awaken Zeus</div>
     <div class="modal-chain-note">10× mining for 7 days. Choose your offering:</div>
-    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">⭐ Pay 1 Stars</button>
-    <button class="modal-ok" style="background:linear-gradient(135deg,#0d4fd6,#1a6fff);margin-bottom:8px;" onclick="payZeusWithTon()">💎 Pay with TON</button>
+    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">✦ Pay 1 Stars</button>
+    <button class="modal-ok" style="background:linear-gradient(135deg,#0d4fd6,#1a6fff);margin-bottom:8px;" onclick="payZeusWithTon()">⬥ Pay with TON</button>
     <button class="modal-cancel" onclick="closeModal('modal-zeus')">CANCEL</button>
   </div>
 </div>
 
 <div class="modal" id="modal-zeus-ton">
   <div class="modal-box">
-    <div class="modal-title">💎 Pay with TON</div>
+    <div class="modal-title">⬥ Pay with TON</div>
     <div class="modal-chain-note">⚠ Send only on the <b>TON network</b>. Other chains will be lost.</div>
     <div class="ton-pay-row"><div class="ton-pay-label">AMOUNT</div><div class="ton-pay-value" id="ton-amount-display" style="color:var(--gold);font-weight:bold;">...</div></div>
-    <div class="ton-pay-row"><div class="ton-pay-label">ADDRESS</div><div class="ton-pay-value" id="ton-address-display">...</div><button class="ton-copy-btn" onclick="copyTonAddress()">📋</button></div>
+    <div class="ton-pay-row"><div class="ton-pay-label">ADDRESS</div><div class="ton-pay-value" id="ton-address-display">...</div><button class="ton-copy-btn" onclick="copyTonAddress()">COPY</button></div>
     <div class="ton-pay-row"><div class="ton-pay-label">MEMO (required)</div><div class="ton-pay-value" id="ton-memo-display">...</div></div>
     <div class="modal-chain-note" style="margin-top:10px;">Your memo is necessary for the transaction to be confirmed. After sending, paste your transaction ID or link below.</div>
     <input class="modal-input" id="ton-txn-input" placeholder="Transaction ID or link" style="margin-top:10px;"/>
@@ -431,8 +411,8 @@
 
 <!-- EVENT MODAL -->
 <div class="modal" id="modal-event">
-  <div class="modal-box" style="max-width:520px;max-height:80vh;overflow-y:auto;">
-    <div class="modal-title" id="event-modal-title">📣 Event</div>
+  <div class="modal-box" style="max-width:460px;max-height:80vh;overflow-y:auto;">
+    <div class="modal-title" id="event-modal-title">Event</div>
     <div class="modal-chain-note" id="event-modal-reward" style="margin-bottom:14px;color:var(--gold);"></div>
     <div id="event-modal-tasks"></div>
     <div class="modal-btns" style="margin-top:16px;">

@@ -73,7 +73,7 @@ function checkMaintenanceBeforeBoot() {
 
 function showMaintenanceScreen(message) {
   const splash = document.getElementById('splash');
-  splash.innerHTML = '<div class="maint-icon">🔒</div><div class="splash-name">OSARYX</div>'
+  splash.innerHTML = '<div class="maint-icon">⬣</div><div class="splash-name">OSARYX</div>'
     + '<div class="maint-msg">' + esc(message || 'The realm is undergoing a sacred ritual. Please return shortly.') + '</div>';
   splash.style.opacity = '1'; splash.style.display = 'flex';
   if (maintTimer) clearInterval(maintTimer);
@@ -119,7 +119,7 @@ function bootApp() {
 
 function showBannedScreen() {
   const splash = document.getElementById('splash');
-  splash.innerHTML = '<div class="maint-icon">⛔</div><div class="splash-name">OSARYX</div><div class="maint-msg">Your access to the realm has been revoked.</div>';
+  splash.innerHTML = '<div class="maint-icon">✕</div><div class="splash-name">OSARYX</div><div class="maint-msg">Your access to the realm has been revoked.</div>';
   splash.style.opacity = '1'; splash.style.display = 'flex';
 }
 
@@ -153,8 +153,8 @@ function finishBoot(u) {
     const starsPrice = cfg.stars_price || cfg.zeus_stars_price || 150;
     const priceEl = document.getElementById('zeus-price-display');
     const starsBtn = document.getElementById('zeus-stars-btn');
-    if (priceEl) priceEl.textContent = starsPrice + ' ⭐ Stars or TON';
-    if (starsBtn) starsBtn.textContent = '⭐ Pay ' + starsPrice + ' Stars';
+    if (priceEl) priceEl.textContent = starsPrice + ' ✦ Stars or TON';
+    if (starsBtn) starsBtn.textContent = '✦ Pay ' + starsPrice + ' Stars';
   }).catch(() => {});
 }
 
@@ -361,7 +361,7 @@ function checkUserNotifications() {
       if (item.status === 'verified') {
         /* Event subtask — no reward in the notification, just confirm done */
         if (isEventTask || !item.reward || item.reward <= 0) {
-          showToast('Quest verified ✅', 'suc');
+          showToast('Quest verified', 'suc');
         } else {
           showToast('"' + item.taskName + '" verified! +' + item.reward + ' ' + CFG.TOKEN_NAME, 'suc');
         }
@@ -380,13 +380,13 @@ function checkUserNotifications() {
   });
   DB.getNFTRequestsFor(currentUser.id).then(reqs => {
     reqs.forEach(req => {
-      showToast('Relic dispatched ✅', 'suc');
+      showToast('Relic dispatched', 'suc');
       DB.markNFTRequestNotified(req.reqId);
     });
   });
   DB.getOsaryxNFTRequestsFor(currentUser.id).then(reqs => {
     reqs.forEach(req => {
-      showToast('OSARYX NFT dispatched ✅', 'suc');
+      showToast('OSARYX NFT dispatched', 'suc');
       DB.markOsaryxNFTRequestNotified(req.reqId);
     });
   });
@@ -591,7 +591,7 @@ function renderShopState() {
     if (!btn) return;
     if (zeus) {
       btn.disabled    = true;
-      btn.textContent = '⚡ ZEUS ACTIVE — ALL POWERS COVERED';
+      btn.textContent = 'ZEUS ACTIVE';
       return;
     }
     const active  = u.runeType === type && u.runeExpiresAt;
@@ -608,7 +608,7 @@ function renderShopState() {
     if (!btn) return;
     if (zeus) {
       btn.disabled    = true;
-      btn.textContent = '⚡ ZEUS ACTIVE — ALL POWERS COVERED';
+      btn.textContent = 'ZEUS ACTIVE';
       return;
     }
     const active  = u.storageHours === hours && u.storageExpiresAt;
@@ -677,7 +677,7 @@ function doStake() {
   amt = Math.floor(amt/1000)*1000;
 
   const stakeBtn = document.querySelector('.form-card-stake .miner-buy-btn');
-  if (stakeBtn) { stakeBtn.disabled = true; stakeBtn.textContent = '⏳ CONSECRATING...'; }
+  if (stakeBtn) { stakeBtn.disabled = true; stakeBtn.textContent = 'CONSECRATING...'; }
   stakeInFlight = true;
 
   DB.getUser(currentUser.id).then(fresh => {
@@ -754,7 +754,7 @@ function renderStakes() {
     return '<div class="stake-card">'
       + '<div class="stake-card-row"><span class="stake-card-amt">' + s.amount.toLocaleString() + ' OSARYX</span><span class="stake-card-yield">+' + s.yield + ' yield</span></div>'
       + '<div class="stake-bar-track"><div class="stake-bar-fill" style="width:' + pct + '%"></div></div>'
-      + '<div class="stake-card-time">' + (rem>0 ? ('Matures in ' + d + 'd ' + h + 'h ' + m + 'm') : '✅ Matured') + '</div></div>';
+      + '<div class="stake-card-time">' + (rem>0 ? ('Matures in ' + d + 'd ' + h + 'h ' + m + 'm') : 'Matured') + '</div></div>';
   }).join('');
   updateStakePreview();
 }
@@ -786,12 +786,12 @@ function buildEventBanner(ev) {
   const banner = document.createElement('div');
   banner.className = 'task-card event-banner';
   const actionHtml = eventCompleted
-    ? '<div class="task-btn verify" style="opacity:0.7;pointer-events:none;">EVENT COMPLETED ✅</div>'
+    ? '<div class="task-btn verify" style="opacity:0.7;pointer-events:none;">COMPLETED</div>'
     : '<button class="task-btn go" onclick="openEventModal(\'' + ev.id + '\')">JOIN EVENT →</button>';
   banner.innerHTML =
-    '<div class="task-icon">' + (ev.icon||'📣') + '</div>' +
+    '<div class="task-icon">' + (ev.icon||'❖') + '</div>' +
     '<div class="task-info">' +
-      '<div class="task-event-badge">✦ ACTIVE EVENT</div>' +
+      '<div class="task-event-badge">ACTIVE EVENT</div>' +
       '<div class="task-name">' + esc(ev.name) + '</div>' +
       '<div class="task-desc">' + esc(ev.desc||'') + '</div>' +
       '<div class="task-reward">+' + ev.reward + ' ' + CFG.TOKEN_NAME + ' total reward</div>' +
@@ -807,7 +807,7 @@ function openEventModal(evId) {
   DB.getEvents().then(events => {
     const ev = events.find(e => e.id === evId);
     if (!ev) return;
-    document.getElementById('event-modal-title').textContent  = (ev.icon||'📣') + ' ' + ev.name;
+    document.getElementById('event-modal-title').textContent  = (ev.icon||'❖') + ' ' + ev.name;
     document.getElementById('event-modal-reward').textContent = 'Complete all tasks to earn +' + ev.reward + ' ' + CFG.TOKEN_NAME;
     const container = document.getElementById('event-modal-tasks');
     container.innerHTML = ev.tasks.map(t => {
@@ -816,7 +816,7 @@ function openEventModal(evId) {
       const state = done ? 'done' : ((currentUser.taskStates||{})[taskKey] || 'go');
       let btnHtml;
       if (done) {
-        btnHtml = '<button class="task-btn verify" disabled>DONE ✅</button>';
+        btnHtml = '<button class="task-btn verify" disabled>DONE</button>';
       } else if (state === 'pending') {
         btnHtml = '<button class="task-btn pending">PENDING</button>';
       } else if (state === 'verify') {
@@ -833,7 +833,7 @@ function openEventModal(evId) {
         : '';
       const taskIconOnclick = (t.type === 'auto_ref' || t.type === 'watch_ad' || !t.target)
         ? '' : 'onclick="goTaskLink(\'' + t.type + '\',\'' + (t.target||'') + '\')" style="cursor:pointer;" title="Tap to open task link"';
-      return '<div class="task-card"><div class="task-icon" ' + taskIconOnclick + '>' + (t.icon||'🎯') + '</div>'
+      return '<div class="task-card"><div class="task-icon" ' + taskIconOnclick + '>' + (t.icon||'◈') + '</div>'
         + '<div class="task-info"><div class="task-name">' + esc(t.name) + '</div>'
         + '<div class="task-desc">' + esc(t.desc||'') + '</div>' + xHtml + '</div>' + btnHtml + '</div>';
     }).join('');
@@ -879,7 +879,7 @@ function markEventTaskDone(evId, taskId) {
     if (currentUser.completedTasks[taskKey]) return;
     currentUser.completedTasks[taskKey] = true;
     delete currentUser.taskStates[taskKey];
-    showToast('Task completed ✅', 'suc');
+    showToast('Task completed', 'suc');
     DB.logTaskClick(taskKey, currentUser.id, currentUser.name);   /* NEW */
   }
 
@@ -903,7 +903,7 @@ function markEventTaskDone(evId, taskId) {
         DB.logTransaction(currentUser.id, currentUser.name, 'event', 'Event completed: ' + ev.name, ev.reward, currentUser.balance);
         DB.addToTotalMined(ev.reward);
         updateDisplay();
-        showToast('🎉 Event complete! +' + ev.reward + ' ' + CFG.TOKEN_NAME, 'suc');
+        showToast('Event complete! +' + ev.reward + ' ' + CFG.TOKEN_NAME, 'suc');
         return persist(currentUser);
       });
     } else {
@@ -974,7 +974,7 @@ function buildTaskCard(task) {
   if (task.type === 'watch_ad') {
     const adCard = document.createElement('div');
     adCard.className = 'task-card watch-ad-card';
-    adCard.innerHTML = '<div class="task-icon">📺</div><div class="task-info"><div class="task-name">' + esc(task.name) + '</div>'
+    adCard.innerHTML = '<div class="task-icon">▣</div><div class="task-info"><div class="task-name">' + esc(task.name) + '</div>'
       + '<div class="task-desc">' + esc(task.desc||'') + '</div>'
       + '<div class="task-reward">+' + task.reward + ' ' + CFG.TOKEN_NAME + '</div></div>'
       + '<button class="task-btn go" onclick="watchAdForReward(\'' + task.id + '\',' + task.reward + ')">WATCH</button>';
@@ -1012,7 +1012,7 @@ function buildTaskCard(task) {
       + '<button class="x-submit-btn" onclick="submitXHandle(\'' + task.id + '\',' + task.reward + ',\'' + esc(task.name) + '\')">SUBMIT</button></div>'
     : '';
 
-  card.innerHTML = '<div class="task-icon" ' + iconOnclick + '>' + (task.icon||'🎯') + '</div><div class="task-info">'
+  card.innerHTML = '<div class="task-icon" ' + iconOnclick + '>' + (task.icon||'◈') + '</div><div class="task-info">'
     + '<div class="task-name">' + esc(task.name) + '</div><div class="task-desc">' + esc(task.desc||'') + '</div>'
     + '<div class="task-reward">+' + task.reward + ' ' + CFG.TOKEN_NAME + '</div>' + xHtml + '</div>' + btnHtml;
   return card;
@@ -1077,7 +1077,7 @@ function verifyTelegramTask(id, reward, target, type) {
         DB.incrementTaskClickCount(id);
         updateDisplay();
         renderTasks();
-        showToast('+' + reward + ' ' + CFG.TOKEN_NAME + '! Quest fulfilled ✅', 'suc');
+        showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' — Quest fulfilled', 'suc');
         checkRefThreshold();
         checkAutoRefTasks();
         return persist(currentUser).then(() => {
@@ -1157,9 +1157,9 @@ function submitZeusTonTxn() {
   if (!txnRef) { showToast('Paste your transaction ID or link', 'err'); return; }
   zeusTonInFlight = true;
   const btn = document.querySelector('#modal-zeus-ton .modal-ok');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ SUBMITTING...'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'SUBMITTING...'; }
   DB.pushEpicGodsRequest({ userId: currentUser.id, userName: currentUser.name, username: currentUser.username, godName: 'zeus', payMethod: 'ton', txnRef })
-    .then(() => { closeModal('modal-zeus-ton'); showToast('Submitted — awaiting verification ⚡', 'suc'); })
+    .then(() => { closeModal('modal-zeus-ton'); showToast('Submitted — awaiting verification', 'suc'); })
     .finally(() => { zeusTonInFlight = false; if (btn) { btn.disabled = false; btn.textContent = 'SUBMIT'; } });
 }
 
@@ -1208,7 +1208,7 @@ function creditAdReward(reward, description) {
     DB.addToTotalMined(reward);
     updateDisplay();
     renderTasks();
-    showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' — ad reward claimed ✅', 'suc');
+    showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' — ad reward claimed', 'suc');
     return persist(currentUser);
   });
 }
@@ -1300,7 +1300,7 @@ function renderOsaryxNFTs() {
   DB.getOsaryxNFTs().then(listings => {
     if (!listings.length) {
       comingSoon.style.display = 'none'; cont.style.display = 'block';
-      cont.innerHTML = '<div class="osaryx-empty-mystic">⚡ <div class="osaryx-empty-title">NO GODS AVAILABLE</div><div class="osaryx-empty-sub">The pantheon rests.</div></div>';
+      cont.innerHTML = '<div class="osaryx-empty-mystic">✦ <div class="osaryx-empty-title">NO GODS AVAILABLE</div><div class="osaryx-empty-sub">The pantheon rests.</div></div>';
       return;
     }
     comingSoon.style.display = 'none'; cont.style.display = 'block';
@@ -1416,9 +1416,9 @@ function renderRefs() {
     const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + '?startapp=ref_' + currentUser.id;
     document.getElementById('ref-link-box').textContent = link;
     document.getElementById('ref-list').innerHTML = refs.map(r =>
-      '<div class="ref-item"><div class="ref-av">👤</div><div class="ref-user">'
+      '<div class="ref-item"><div class="ref-av">❖</div><div class="ref-user">'
       + '<div class="ref-uname">' + esc(r.refereeName) + '</div>'
-      + '<div class="ref-ustat ' + r.status + '">' + (r.status==='verified' ? ('✅ Verified · +' + Math.round(r.earnedTotal) + ' channelled') : '⏳ Awakening') + '</div>'
+      + '<div class="ref-ustat ' + r.status + '">' + (r.status==='verified' ? ('Verified · +' + Math.round(r.earnedTotal) + ' channelled') : 'Awakening') + '</div>'
       + '</div><div class="ref-bonus">' + (r.status==='verified' ? ('+' + CFG.REF_BONUS) : '---') + '</div></div>'
     ).join('') || '<div class="empty-note">No souls invoked yet.</div>';
   });
@@ -1430,7 +1430,7 @@ function copyRefLink() {
   const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select();
   try { document.execCommand('copy'); } catch(e){}
   document.body.removeChild(el);
-  showToast('Invocation scroll copied ✅', 'suc');
+  showToast('Invocation scroll copied', 'suc');
   maybeShowRefAd();
 }
 
@@ -1519,9 +1519,9 @@ function loadOwnedNFTs() {
     if (!gallery) return;
     if (!ownedNFTsCache.length) { gallery.innerHTML = '<div class="empty-note">No relics bound yet</div>'; return; }
     gallery.innerHTML = '<div class="nft-grid">' + ownedNFTsCache.map(n => {
-      const action = n.dispatchStatus === 'pending' ? '<div class="nft-send-status">📬 Pending dispatch</div>'
-        : n.dispatchStatus === 'sent' ? '<div class="nft-send-status">✅ Dispatched</div>'
-        : '<button class="nft-send-btn" onclick="openSendNFT(\'' + n.id + '\',\'' + esc(n.chain||'') + '\',\'' + n.source + '\')">DISPATCH ↗</button>';
+      const action = n.dispatchStatus === 'pending' ? '<div class="nft-send-status">Pending dispatch</div>'
+        : n.dispatchStatus === 'sent' ? '<div class="nft-send-status">Dispatched</div>'
+        : '<button class="nft-send-btn" onclick="openSendNFT(\'' + n.id + '\',\'' + esc(n.chain||'') + '\',\'' + n.source + '\')">DISPATCH</button>';
       return '<div class="nft-item"><img src="' + (n.img||'') + '" onerror="this.style.display=\'none\'">'
         + '<div class="nft-item-body"><div class="nft-item-name">' + esc(n.name) + '</div>'
         + '<div class="nft-item-chain">' + esc(n.chain||'') + '</div>' + action + '</div></div>';
@@ -1557,7 +1557,7 @@ function confirmSendNFT() {
   const statusFn = currentNFTSource === 'osaryx' ? DB.setOsaryxNFTDispatchStatus : DB.setNFTDispatchStatus;
   pushFn({ reqId: 'NFT'+Date.now(), userId: currentUser.id, userName: currentUser.name, nftId: nft.id, nftName: nft.name, nftImg: nft.img, chain: nft.chain, worth: nft.worth, address: addr, ts: Date.now() })
     .then(() => statusFn(nft.id, 'pending'))
-    .then(() => { showToast('Dispatch submitted ✅', 'suc'); openProfile(); })
+    .then(() => { showToast('Dispatch submitted', 'suc'); openProfile(); })
     .finally(() => { dispatchInFlight = false; });
 }
 
