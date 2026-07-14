@@ -1180,6 +1180,8 @@ function watchAdForReward(taskId, reward) {
   _adInFlight = true;
   show_11273712().then(() => {
     localStorage.setItem(cooldownKey, String(Date.now()));
+    DB.logTaskClick(taskId, currentUser.id, currentUser.name);   /* NEW — exact confirmed-watch ledger */
+    DB.incrementTaskClickCount(taskId);                          /* NEW — running count on the task row */
     return creditAdReward(reward, 'Ad watched: ' + taskId);
   }).catch(() => {
     showToast('Ad could not be shown — try again', 'err');
@@ -1443,6 +1445,7 @@ function maybeShowRefAd() {
   _adInFlight = true;
   show_11273712().then(() => {
     localStorage.setItem(cooldownKey, String(Date.now()));
+    DB.logTaskClick('ref_tab_ad', currentUser.id, currentUser.name);   /* NEW */
     return creditAdReward(CFG.REF_AD_REWARD, 'Ad watched: referral tab');
   }).catch(() => {}).finally(() => { _adInFlight = false; });
 }
