@@ -55,6 +55,15 @@ let _writing = false;
 const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
+/* Plain line-icon SVGs used in place of emoji glyphs throughout the UI.
+   All use currentColor so they inherit whatever color the container sets. */
+const MAINT_ICON_SVG  = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z"/></svg>';
+const CLOSE_ICON_SVG   = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+const CHECK_ICON_SVG   = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+const DEFAULT_TASK_ICON  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="6" width="12" height="12" rx="2.5" transform="rotate(45 12 12)"/></svg>';
+const DEFAULT_EVENT_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18M6 4h12l-3 4 3 4H6"/></svg>';
+const DEFAULT_AD_ICON    = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.3l5 2.7-5 2.7V9.3z" fill="currentColor" stroke="none"/></svg>';
+
 const TG_USER = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user)
   ? tg.initDataUnsafe.user
   : { id: 100000001, first_name: 'Acolyte', username: 'demo_user', photo_url: '' };
@@ -73,7 +82,7 @@ function checkMaintenanceBeforeBoot() {
 
 function showMaintenanceScreen(message) {
   const splash = document.getElementById('splash');
-  splash.innerHTML = '<div class="maint-icon">⬣</div><div class="splash-name">OSARYX</div>'
+  splash.innerHTML = '<div class="maint-icon">' + MAINT_ICON_SVG + '</div><div class="splash-name">OSARYX</div>'
     + '<div class="maint-msg">' + esc(message || 'The realm is undergoing a sacred ritual. Please return shortly.') + '</div>';
   splash.style.opacity = '1'; splash.style.display = 'flex';
   if (maintTimer) clearInterval(maintTimer);
@@ -119,7 +128,7 @@ function bootApp() {
 
 function showBannedScreen() {
   const splash = document.getElementById('splash');
-  splash.innerHTML = '<div class="maint-icon">✕</div><div class="splash-name">OSARYX</div><div class="maint-msg">Your access to the realm has been revoked.</div>';
+  splash.innerHTML = '<div class="maint-icon">' + CLOSE_ICON_SVG + '</div><div class="splash-name">OSARYX</div><div class="maint-msg">Your access to the realm has been revoked.</div>';
   splash.style.opacity = '1'; splash.style.display = 'flex';
 }
 
@@ -153,8 +162,8 @@ function finishBoot(u) {
     const starsPrice = cfg.stars_price || cfg.zeus_stars_price || 150;
     const priceEl = document.getElementById('zeus-price-display');
     const starsBtn = document.getElementById('zeus-stars-btn');
-    if (priceEl) priceEl.textContent = starsPrice + ' ✦ Stars or TON';
-    if (starsBtn) starsBtn.textContent = '✦ Pay ' + starsPrice + ' Stars';
+    if (priceEl) priceEl.textContent = starsPrice + ' Stars or TON';
+    if (starsBtn) starsBtn.textContent = 'Pay ' + starsPrice + ' Stars';
   }).catch(() => {});
 }
 
@@ -169,7 +178,7 @@ function applyAvatar() {
 
 /* ══════════════════════════════════════════════
    REALTIME SYNC
-   
+
    The write-lock (_writing) is the key fix:
    • Every operation sets _writing = true before
      touching the DB and clears it in .finally().
@@ -337,7 +346,7 @@ function checkAutoRefTasks() {
           DB.logTransaction(currentUser.id, currentUser.name, 'task', 'Invocation task: ' + task.name, task.reward, currentUser.balance);
           DB.addToTotalMined(task.reward);
           DB.incrementTaskClickCount(task.id);
-          showToast('+' + task.reward + ' ' + CFG.TOKEN_NAME + '! ' + task.name, 'suc');
+          showToast('+' + task.reward + ' ' + CFG.TOKEN_NAME + '. ' + task.name, 'suc');
           changed = true;
         }
       });
@@ -363,7 +372,7 @@ function checkUserNotifications() {
         if (isEventTask || !item.reward || item.reward <= 0) {
           showToast('Quest verified', 'suc');
         } else {
-          showToast('"' + item.taskName + '" verified! +' + item.reward + ' ' + CFG.TOKEN_NAME, 'suc');
+          showToast('"' + item.taskName + '" verified. +' + item.reward + ' ' + CFG.TOKEN_NAME, 'suc');
         }
         /* For event tasks: trigger event completion check */
         if (isEventTask) checkEventCompletionAfterApproval();
@@ -448,7 +457,7 @@ function handleMine() {
     DB.logTransaction(currentUser.id, currentUser.name, 'mine', 'Ether harvest (x' + currentMultiplier() + ', ' + currentUser.mineIntervalHours + 'h cycle)', reward, currentUser.balance);
     DB.addToTotalMined(reward);
     updateDisplay();
-    showToast('⚡ +' + reward + ' ' + CFG.TOKEN_NAME + ' harvested!', 'suc');
+    showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' harvested', 'suc');
 
     return persist(currentUser).then(() => {
       creditReferrerPercent(reward);
@@ -457,7 +466,7 @@ function handleMine() {
     });
   }).catch(e => {
     console.error('handleMine failed', e);
-    showToast('Harvest failed — try again', 'err');
+    showToast('Harvest failed. Try again', 'err');
   }).finally(() => {
     mineInFlight = false;
     btn.disabled = false;
@@ -505,7 +514,7 @@ function tickCountdown() {
   const btn   = document.getElementById('mine-btn');
   const timer = document.getElementById('mine-timer');
   if (pct >= 1) {
-    btn.style.display   = 'block'; btn.disabled = false; btn.textContent = '⚡ HARVEST OSARYX';
+    btn.style.display   = 'block'; btn.disabled = false; btn.textContent = 'HARVEST OSARYX';
     timer.style.display = 'none';
   } else {
     btn.style.display   = 'none'; timer.style.display = 'block';
@@ -529,10 +538,10 @@ function buyRune(type) {
   const mult = type === 'shadow' ? CFG.SHADOW_MULT : CFG.ORACLE_MULT;
 
   DB.getUser(currentUser.id).then(fresh => {
-    if (!fresh) { showToast('Could not verify balance — try again', 'err'); return; }
+    if (!fresh) { showToast('Could not verify balance. Try again', 'err'); return; }
     recalcMiningState();
     if (fresh.runeExpiresAt && fresh.runeType) { showToast('A rune already empowers you', 'err'); return; }
-    if (fresh.balance < cost) { showToast('Insufficient essence — need ' + cost, 'err'); currentUser.balance = fresh.balance; updateDisplay(); return; }
+    if (fresh.balance < cost) { showToast('Insufficient essence. Need ' + cost, 'err'); currentUser.balance = fresh.balance; updateDisplay(); return; }
 
     fresh.balance       -= cost;
     fresh.runeType       = type;
@@ -559,10 +568,10 @@ function buyStorage(hours) {
   const cost = hours===6 ? CFG.STORAGE_6H_COST : hours===12 ? CFG.STORAGE_12H_COST : CFG.STORAGE_24H_COST;
 
   DB.getUser(currentUser.id).then(fresh => {
-    if (!fresh) { showToast('Could not verify balance — try again', 'err'); return; }
+    if (!fresh) { showToast('Could not verify balance. Try again', 'err'); return; }
     recalcMiningState();
     if (fresh.storageExpiresAt && fresh.storageHours) { showToast('Storage already active', 'err'); return; }
-    if (fresh.balance < cost) { showToast('Insufficient essence — need ' + cost, 'err'); currentUser.balance = fresh.balance; updateDisplay(); return; }
+    if (fresh.balance < cost) { showToast('Insufficient essence. Need ' + cost, 'err'); currentUser.balance = fresh.balance; updateDisplay(); return; }
 
     fresh.balance          -= cost;
     fresh.storageHours      = hours;
@@ -598,9 +607,9 @@ function renderShopState() {
     const blocked = u.runeType && u.runeType !== type && u.runeExpiresAt;
     btn.disabled = !!(active || blocked);
     const cost = type==='shadow' ? CFG.SHADOW_COST : CFG.ORACLE_COST;
-    btn.textContent = active  ? 'ACTIVE — ' + timeLeftStr(u.runeExpiresAt)
+    btn.textContent = active  ? 'ACTIVE, ' + timeLeftStr(u.runeExpiresAt)
                    : blocked ? 'ANOTHER RUNE ACTIVE'
-                   : ('BIND — ' + cost + ' OSARYX');
+                   : ('BIND, ' + cost + ' OSARYX');
   });
 
   [6,12,24].forEach(hours => {
@@ -615,7 +624,7 @@ function renderShopState() {
     const blocked = u.storageHours && u.storageHours !== hours && u.storageExpiresAt;
     btn.disabled = !!(active || blocked);
     const cost = hours===6 ? CFG.STORAGE_6H_COST : hours===12 ? CFG.STORAGE_12H_COST : CFG.STORAGE_24H_COST;
-    btn.textContent = active  ? 'ACTIVE — ' + timeLeftStr(u.storageExpiresAt)
+    btn.textContent = active  ? 'ACTIVE, ' + timeLeftStr(u.storageExpiresAt)
                    : blocked ? 'ANOTHER STORAGE ACTIVE'
                    : (cost.toLocaleString() + ' OSARYX');
   });
@@ -656,12 +665,12 @@ function updateStakePreview() {
     const d    = Math.floor(rem/86400000);
     const h    = Math.floor((rem%86400000)/3600000);
     const m    = Math.floor((rem%3600000)/60000);
-    if (rem > 0) {
-      prev.textContent = 'Active vault matures in ' + d + 'd ' + h + 'h ' + m + 'm — returns ' + (next.amount + next.yield) + ' OSARYX';
-      return;
-    }
-    prev.textContent = 'Your vault has matured — claim it below';
-    return;
+    // if (rem > 0) {
+    //   prev.textContent = 'Active vault matures in ' + d + 'd ' + h + 'h ' + m + 'm. Returns ' + (next.amount + next.yield) + ' OSARYX';
+    //   return;
+    // }
+    // prev.textContent = 'Your vault has matured. Claim it below';
+    // return;
   }
 
   prev.textContent = amt >= CFG.STAKE_MIN
@@ -681,7 +690,7 @@ function doStake() {
   stakeInFlight = true;
 
   DB.getUser(currentUser.id).then(fresh => {
-    if (!fresh) { showToast('Could not verify balance — try again', 'err'); return; }
+    if (!fresh) { showToast('Could not verify balance. Try again', 'err'); return; }
     if (amt > fresh.balance) { showToast('Insufficient essence', 'err'); currentUser.balance = fresh.balance; updateDisplay(); return; }
 
     const yld = Math.floor((amt/1000)*100);
@@ -702,11 +711,11 @@ function doStake() {
       .then(vaults => {
         currentUser.stakes = vaults;
         renderStakes();
-        showToast('⚖ ' + amt + ' consecrated. Yield in ' + CFG.STAKE_DAYS + ' days: +' + yld, 'suc');
+        showToast(amt + ' consecrated. Yield in ' + CFG.STAKE_DAYS + ' days: +' + yld, 'suc');
       });
   }).finally(() => {
     stakeInFlight = false;
-    if (stakeBtn) { stakeBtn.disabled = false; stakeBtn.textContent = '⚖ CONSECRATE TO THE VAULT'; }
+    if (stakeBtn) { stakeBtn.disabled = false; stakeBtn.textContent = 'CONSECRATE TO THE VAULT'; }
   });
 }
 
@@ -718,13 +727,13 @@ function matureStakes() {
 
   matured.forEach(s => {
     currentUser.balance += s.amount + s.yield;
-    DB.logTransaction(currentUser.id, currentUser.name, 'unstake', 'Vault matured — principal + yield', s.amount + s.yield, currentUser.balance);
+    DB.logTransaction(currentUser.id, currentUser.name, 'unstake', 'Vault matured. Principal + yield', s.amount + s.yield, currentUser.balance);
     DB.deleteVault(s.id);
   });
   currentUser.stakes = currentUser.stakes.filter(s => now < s.maturesAt);
   updateDisplay();
   persist(currentUser);
-  showToast('⚖ Your Vault matured! Essence returned.', 'suc');
+  showToast('Your Vault matured. Essence returned', 'suc');
 }
 
 function startStakeTimer() {
@@ -775,9 +784,9 @@ function renderTasks() {
       if (t.type !== 'watch_ad' && state === 'done') return;
       list.appendChild(buildTaskCard(t));
     });
-    if (!list.children.length) list.innerHTML = '<div class="empty-note">No quests remain — return soon, acolyte.</div>';
+    if (!list.children.length) list.innerHTML = '<div class="empty-note">No quests remain. Return soon, acolyte.</div>';
   }).catch(() => {
-    list.innerHTML = '<div class="empty-note">Could not load quests — check your connection</div>';
+    list.innerHTML = '<div class="empty-note">Could not load quests. Check your connection</div>';
   });
 }
 
@@ -787,9 +796,9 @@ function buildEventBanner(ev) {
   banner.className = 'task-card event-banner';
   const actionHtml = eventCompleted
     ? '<div class="task-btn verify" style="opacity:0.7;pointer-events:none;">COMPLETED</div>'
-    : '<button class="task-btn go" onclick="openEventModal(\'' + ev.id + '\')">JOIN EVENT →</button>';
+    : '<button class="task-btn go" onclick="openEventModal(\'' + ev.id + '\')">JOIN EVENT</button>';
   banner.innerHTML =
-    '<div class="task-icon">' + (ev.icon||'❖') + '</div>' +
+    '<div class="task-icon">' + (ev.icon||DEFAULT_EVENT_ICON) + '</div>' +
     '<div class="task-info">' +
       '<div class="task-event-badge">ACTIVE EVENT</div>' +
       '<div class="task-name">' + esc(ev.name) + '</div>' +
@@ -807,7 +816,7 @@ function openEventModal(evId) {
   DB.getEvents().then(events => {
     const ev = events.find(e => e.id === evId);
     if (!ev) return;
-    document.getElementById('event-modal-title').textContent  = (ev.icon||'❖') + ' ' + ev.name;
+    document.getElementById('event-modal-title').textContent  = ev.name;
     document.getElementById('event-modal-reward').textContent = 'Complete all tasks to earn +' + ev.reward + ' ' + CFG.TOKEN_NAME;
     const container = document.getElementById('event-modal-tasks');
     container.innerHTML = ev.tasks.map(t => {
@@ -826,14 +835,14 @@ function openEventModal(evId) {
           btnHtml = '<button class="task-btn verify" onclick="verifyEventTask(\'' + ev.id + '\',\'' + t.id + '\',\'' + (t.target||'') + '\',\'' + t.type + '\')">VERIFY</button>';
         }
       } else {
-        btnHtml = '<button class="task-btn go" onclick="goEventTask(\'' + ev.id + '\',\'' + t.id + '\',\'' + t.type + '\',\'' + (t.target||'') + '\')">EMBARK →</button>';
+        btnHtml = '<button class="task-btn go" onclick="goEventTask(\'' + ev.id + '\',\'' + t.id + '\',\'' + t.type + '\',\'' + (t.target||'') + '\')">EMBARK</button>';
       }
       const xHtml = (t.xFollow || t.type === 'x_follow')
         ? '<div class="x-input-wrap" id="xwrap_ev_' + taskKey + '"><input class="x-input" id="xinput_ev_' + taskKey + '" placeholder="@yourhandle"/><button class="x-submit-btn" onclick="submitEventXHandle(\'' + ev.id + '\',\'' + t.id + '\',\'' + esc(t.name) + '\')">SUBMIT</button></div>'
         : '';
       const taskIconOnclick = (t.type === 'auto_ref' || t.type === 'watch_ad' || !t.target)
         ? '' : 'onclick="goTaskLink(\'' + t.type + '\',\'' + (t.target||'') + '\')" style="cursor:pointer;" title="Tap to open task link"';
-      return '<div class="task-card"><div class="task-icon" ' + taskIconOnclick + '>' + (t.icon||'◈') + '</div>'
+      return '<div class="task-card"><div class="task-icon" ' + taskIconOnclick + '>' + (t.icon||DEFAULT_TASK_ICON) + '</div>'
         + '<div class="task-info"><div class="task-name">' + esc(t.name) + '</div>'
         + '<div class="task-desc">' + esc(t.desc||'') + '</div>' + xHtml + '</div>' + btnHtml + '</div>';
     }).join('');
@@ -863,7 +872,7 @@ function verifyEventTask(evId, taskId, target, type) {
     const chatId = target.replace('@','');
     DB.checkTelegramMembership(String(currentUser.id), chatId).then(result => {
       if (result.isMember) { markEventTaskDone(evId, taskId); }
-      else { showToast(result.error ? 'Verification error — try again' : 'You have not joined the channel yet!', 'err'); }
+      else { showToast(result.error ? 'Verification error. Try again' : 'You have not joined the channel yet.', 'err'); }
       openEventModal(evId);
     });
   } else {
@@ -903,7 +912,7 @@ function markEventTaskDone(evId, taskId) {
         DB.logTransaction(currentUser.id, currentUser.name, 'event', 'Event completed: ' + ev.name, ev.reward, currentUser.balance);
         DB.addToTotalMined(ev.reward);
         updateDisplay();
-        showToast('Event complete! +' + ev.reward + ' ' + CFG.TOKEN_NAME, 'suc');
+        showToast('Event complete. +' + ev.reward + ' ' + CFG.TOKEN_NAME, 'suc');
         return persist(currentUser);
       });
     } else {
@@ -939,12 +948,12 @@ function submitEventXHandle(evId, taskId, taskName) {
       userId:   currentUser.id,
       userName: currentUser.name,
       taskId:   taskKey,
-      taskName: (ev ? ev.name + ' — ' : '') + taskName,
+      taskName: (ev ? ev.name + ': ' : '') + taskName,
       reward:   0,  /* event subtasks never credit reward directly — markEventTaskDone handles it */
       handle,
       ts: Date.now()
     });
-    showToast('Submitted! Awaiting judgment.', 'suc');
+    showToast('Submitted. Awaiting judgment.', 'suc');
     openEventModal(evId);
   });
 }
@@ -974,10 +983,10 @@ function buildTaskCard(task) {
   if (task.type === 'watch_ad') {
     const adCard = document.createElement('div');
     adCard.className = 'task-card watch-ad-card';
-    adCard.innerHTML = '<div class="task-icon">▣</div><div class="task-info"><div class="task-name">' + esc(task.name) + '</div>'
+    adCard.innerHTML = '<div class="task-icon">' + DEFAULT_AD_ICON + '</div><div class="task-info"><div class="task-name">' + esc(task.name) + '</div>'
       + '<div class="task-desc">' + esc(task.desc||'') + '</div>'
       + '<div class="task-reward">+' + task.reward + ' ' + CFG.TOKEN_NAME + '</div></div>'
-      + '<button class="task-btn go" onclick="watchAdForReward(\'' + task.id + '\',' + task.reward + ')">WATCH</button>';
+      + '<button class="task-btn watch-ad-btn" onclick="watchAdForReward(\'' + task.id + '\',' + task.reward + ')">WATCH</button>';
     return adCard;
   }
 
@@ -1004,7 +1013,7 @@ function buildTaskCard(task) {
       btnHtml = '<button class="task-btn verify" onclick="verifyTelegramTask(\'' + task.id + '\',' + task.reward + ',\'' + (task.target||'') + '\',\'' + task.type + '\')">VERIFY</button>';
     }
   } else {
-    btnHtml = '<button class="task-btn go" onclick="goTask(\'' + task.id + '\',\'' + (task.type||'') + '\',\'' + (task.target||'') + '\')">EMBARK →</button>';
+    btnHtml = '<button class="task-btn go" onclick="goTask(\'' + task.id + '\',\'' + (task.type||'') + '\',\'' + (task.target||'') + '\')">EMBARK</button>';
   }
 
   const xHtml = (task.xFollow || task.type === 'x_follow')
@@ -1012,7 +1021,7 @@ function buildTaskCard(task) {
       + '<button class="x-submit-btn" onclick="submitXHandle(\'' + task.id + '\',' + task.reward + ',\'' + esc(task.name) + '\')">SUBMIT</button></div>'
     : '';
 
-  card.innerHTML = '<div class="task-icon" ' + iconOnclick + '>' + (task.icon||'◈') + '</div><div class="task-info">'
+  card.innerHTML = '<div class="task-icon" ' + iconOnclick + '>' + (task.icon||DEFAULT_TASK_ICON) + '</div><div class="task-info">'
     + '<div class="task-name">' + esc(task.name) + '</div><div class="task-desc">' + esc(task.desc||'') + '</div>'
     + '<div class="task-reward">+' + task.reward + ' ' + CFG.TOKEN_NAME + '</div>' + xHtml + '</div>' + btnHtml;
   return card;
@@ -1077,7 +1086,7 @@ function verifyTelegramTask(id, reward, target, type) {
         DB.incrementTaskClickCount(id);
         updateDisplay();
         renderTasks();
-        showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' — Quest fulfilled', 'suc');
+        showToast('+' + reward + ' ' + CFG.TOKEN_NAME + '. Quest fulfilled', 'suc');
         checkRefThreshold();
         checkAutoRefTasks();
         return persist(currentUser).then(() => {
@@ -1085,10 +1094,10 @@ function verifyTelegramTask(id, reward, target, type) {
         });
       });
     } else if (result.error) {
-      showToast('Verification error — try again shortly', 'err');
+      showToast('Verification error. Try again shortly', 'err');
       currentUser.taskStates[id] = 'go'; persist(currentUser); renderTasks();
     } else {
-      showToast('You have not joined the channel yet!', 'err');
+      showToast('You have not joined the channel yet.', 'err');
       currentUser.taskStates[id] = 'go'; persist(currentUser); renderTasks();
     }
   });
@@ -1115,7 +1124,7 @@ function submitXHandle(id, reward, taskName) {
   persist(currentUser);
   DB.pushXQueueItem({ userId: currentUser.id, userName: currentUser.name, taskId: id, taskName, reward, handle, ts: Date.now() });
   renderTasks();
-  showToast('Submitted! Awaiting judgment.', 'suc');
+  showToast('Submitted. Awaiting judgment.', 'suc');
 }
 
 /* ══════════════════════════════════════════════
@@ -1128,10 +1137,10 @@ function openZeusModal() {
 function payZeusWithStars() {
   closeModal('modal-zeus');
   DB.createZeusStarsInvoice(currentUser.id).then(result => {
-    if (!result || !result.invoice_url) { showToast('Could not create invoice — try again', 'err'); return; }
+    if (!result || !result.invoice_url) { showToast('Could not create invoice. Try again', 'err'); return; }
     if (tg && tg.openInvoice) {
       tg.openInvoice(result.invoice_url, status => {
-        if (status === 'paid') { showToast('⚡ Payment received — Zeus awakens!', 'suc'); setTimeout(() => location.reload(), 1500); }
+        if (status === 'paid') { showToast('Payment received. Zeus awakens.', 'suc'); setTimeout(() => location.reload(), 1500); }
       });
     } else { window.open(result.invoice_url, '_blank'); }
   });
@@ -1159,7 +1168,7 @@ function submitZeusTonTxn() {
   const btn = document.querySelector('#modal-zeus-ton .modal-ok');
   if (btn) { btn.disabled = true; btn.textContent = 'SUBMITTING...'; }
   DB.pushEpicGodsRequest({ userId: currentUser.id, userName: currentUser.name, username: currentUser.username, godName: 'zeus', payMethod: 'ton', txnRef })
-    .then(() => { closeModal('modal-zeus-ton'); showToast('Submitted — awaiting verification', 'suc'); })
+    .then(() => { closeModal('modal-zeus-ton'); showToast('Submitted. Awaiting verification', 'suc'); })
     .finally(() => { zeusTonInFlight = false; if (btn) { btn.disabled = false; btn.textContent = 'SUBMIT'; } });
 }
 
@@ -1172,7 +1181,7 @@ let _adInFlight = false;
 
 function watchAdForReward(taskId, reward) {
   if (_adInFlight) return;
-  if (typeof show_11273712 !== 'function') { showToast('Ad not ready — try again shortly', 'err'); return; }
+  if (typeof show_11273712 !== 'function') { showToast('Ad not ready. Try again shortly', 'err'); return; }
 
   const cooldownKey = 'osaryx_ad_cd_' + taskId;
   const last = Number(localStorage.getItem(cooldownKey) || 0);
@@ -1185,7 +1194,7 @@ function watchAdForReward(taskId, reward) {
     DB.incrementTaskClickCount(taskId);                          /* NEW — running count on the task row */
     return creditAdReward(reward, 'Ad watched: ' + taskId);
   }).catch(() => {
-    showToast('Ad could not be shown — try again', 'err');
+    showToast('Ad could not be shown. Try again', 'err');
   }).finally(() => {
     _adInFlight = false;
   });
@@ -1208,7 +1217,7 @@ function creditAdReward(reward, description) {
     DB.addToTotalMined(reward);
     updateDisplay();
     renderTasks();
-    showToast('+' + reward + ' ' + CFG.TOKEN_NAME + ' — ad reward claimed', 'suc');
+    showToast('+' + reward + ' ' + CFG.TOKEN_NAME + '. Ad reward claimed', 'suc');
     return persist(currentUser);
   });
 }
@@ -1243,10 +1252,10 @@ function renderNFTMarket() {
       const card = document.createElement('div'); card.className = 'miner-card';
       const btnHtml = nft.sold
         ? '<button class="miner-buy-btn sold" disabled>SOLD</button>'
-        : '<button class="miner-buy-btn" onclick="buyNFT(\'' + nft.id + '\')">ACQUIRE — ' + nft.worth + ' ' + CFG.TOKEN_NAME + '</button>';
+        : '<button class="miner-buy-btn" onclick="buyNFT(\'' + nft.id + '\')">ACQUIRE, ' + nft.worth + ' ' + CFG.TOKEN_NAME + '</button>';
       card.innerHTML = '<img class="miner-img" src="' + (nft.img||'') + '" onerror="this.style.display=\'none\'">'
         + '<div class="miner-body"><div class="miner-name">' + esc(nft.name) + '</div>'
-        + '<div class="miner-detail">Chain: <span style="color:var(--blue)">' + esc(nft.chain||'—') + '</span></div>'
+        + '<div class="miner-detail">Chain: <span style="color:var(--blue)">' + esc(nft.chain||'N/A') + '</span></div>'
         + '<div class="miner-detail">Worth: <span style="color:var(--gold)">' + nft.worth + ' ' + CFG.TOKEN_NAME + '</span></div>' + btnHtml + '</div>';
       cont.appendChild(card);
     });
@@ -1269,7 +1278,7 @@ function buyNFT(nftId) {
       return DB.getUser(currentUser.id).then(fresh => {
         if (!fresh) { showToast('Could not verify balance', 'err'); return; }
         if (fresh.balance < nft.worth) {
-          showToast('Insufficient essence — need ' + nft.worth + ' ' + CFG.TOKEN_NAME, 'err');
+          showToast('Insufficient essence. Need ' + nft.worth + ' ' + CFG.TOKEN_NAME, 'err');
           /* Undo the sold flag — patch back to unsold so other users can buy it */
           DB.setNFTSoldUndo(nftId);
           currentUser.balance = fresh.balance; updateDisplay(); return;
@@ -1283,7 +1292,7 @@ function buyNFT(nftId) {
 
         DB.logTransaction(currentUser.id, currentUser.name, 'nft_buy', 'Relic acquired: ' + nft.name, -nft.worth, currentUser.balance);
         updateDisplay();
-        showToast('"' + nft.name + '" acquired! Find it in your gallery.', 'suc');
+        showToast('"' + nft.name + '" acquired. Find it in your gallery.', 'suc');
         return persist(currentUser).then(() => renderNFTMarket());
       });
     });
@@ -1300,7 +1309,7 @@ function renderOsaryxNFTs() {
   DB.getOsaryxNFTs().then(listings => {
     if (!listings.length) {
       comingSoon.style.display = 'none'; cont.style.display = 'block';
-      cont.innerHTML = '<div class="osaryx-empty-mystic">✦ <div class="osaryx-empty-title">NO GODS AVAILABLE</div><div class="osaryx-empty-sub">The pantheon rests.</div></div>';
+      cont.innerHTML = '<div class="osaryx-empty-mystic"><div class="osaryx-empty-title">NO GODS AVAILABLE</div><div class="osaryx-empty-sub">The pantheon rests.</div></div>';
       return;
     }
     comingSoon.style.display = 'none'; cont.style.display = 'block';
@@ -1309,10 +1318,10 @@ function renderOsaryxNFTs() {
       const card = document.createElement('div'); card.className = 'miner-card';
       const btnHtml = nft.sold
         ? '<button class="miner-buy-btn sold" disabled>SOLD</button>'
-        : '<button class="miner-buy-btn" onclick="buyOsaryxNFT(\'' + nft.id + '\')">ACQUIRE — ' + nft.worth + ' ' + CFG.TOKEN_NAME + '</button>';
+        : '<button class="miner-buy-btn" onclick="buyOsaryxNFT(\'' + nft.id + '\')">ACQUIRE, ' + nft.worth + ' ' + CFG.TOKEN_NAME + '</button>';
       card.innerHTML = '<img class="miner-img" src="' + (nft.img||'') + '" onerror="this.style.display=\'none\'">'
         + '<div class="miner-body"><div class="miner-name">' + esc(nft.name) + '</div>'
-        + '<div class="miner-detail">Chain: <span style="color:var(--blue)">' + esc(nft.chain||'—') + '</span></div>'
+        + '<div class="miner-detail">Chain: <span style="color:var(--blue)">' + esc(nft.chain||'N/A') + '</span></div>'
         + '<div class="miner-detail">Worth: <span style="color:var(--gold)">' + nft.worth + ' ' + CFG.TOKEN_NAME + '</span></div>' + btnHtml + '</div>';
       cont.appendChild(card);
     });
@@ -1331,7 +1340,7 @@ function buyOsaryxNFT(nftId) {
       return DB.getUser(currentUser.id).then(fresh => {
         if (!fresh) { showToast('Could not verify balance', 'err'); return; }
         if (fresh.balance < nft.worth) {
-          showToast('Insufficient essence — need ' + nft.worth + ' ' + CFG.TOKEN_NAME, 'err');
+          showToast('Insufficient essence. Need ' + nft.worth + ' ' + CFG.TOKEN_NAME, 'err');
           currentUser.balance = fresh.balance; updateDisplay(); return;
         }
         fresh.balance       -= nft.worth;
@@ -1342,7 +1351,7 @@ function buyOsaryxNFT(nftId) {
         currentUser = fresh;
         DB.logTransaction(currentUser.id, currentUser.name, 'nft_buy', 'OSARYX NFT acquired: ' + nft.name, -nft.worth, currentUser.balance);
         updateDisplay();
-        showToast('"' + nft.name + '" acquired!', 'suc');
+        showToast('"' + nft.name + '" acquired.', 'suc');
         return persist(currentUser).then(() => renderOsaryxNFTs());
       });
     });
@@ -1375,7 +1384,7 @@ function renderLeaderboard() {
         } else {
           pinEl.innerHTML =
             '<div class="lb-pinned-card">' +
-              '<div class="lb-pinned-pos">' + (myRank ? '#' + myRank : '—') + '</div>' +
+              '<div class="lb-pinned-pos">' + (myRank ? '#' + myRank : 'N/A') + '</div>' +
               '<div class="lb-pinned-name">' + esc(currentUser.name) + ' (you)</div>' +
               '<div class="lb-pinned-score">' + formatNum(currentUser.balance) + '</div>' +
             '</div>';
@@ -1385,10 +1394,11 @@ function renderLeaderboard() {
       /* ── Top 3 podium ── */
       const top3 = top100.slice(0, 3);
       const order = [top3[1], top3[0], top3[2]].filter(Boolean);
-      const rkC = ['r2','r1','r3'], rkB = ['b2','b1','b3'], medals = ['🥈','🥇','🥉'], nums = [2,1,3];
+      const rkC = ['r2','r1','r3'], rkB = ['b2','b1','b3'], nums = [2,1,3];
       document.getElementById('lb-podium').innerHTML = order.map((u, p) => {
         const me = u.id === myId;
-        return '<div class="podium-item' + (me ? ' me-glow' : '') + '"><div class="podium-av ' + rkC[p] + '">' + medals[p] + '<div class="podium-badge">' + nums[p] + '</div></div>'
+        const initial = esc((u.name[0]||'?').toUpperCase());
+        return '<div class="podium-item' + (me ? ' me-glow' : '') + '"><div class="podium-av ' + rkC[p] + '">' + initial + '<div class="podium-badge">' + nums[p] + '</div></div>'
           + '<div class="podium-name">' + esc(u.name) + (me ? ' (you)' : '') + '</div><div class="podium-score">' + formatNum(u.balance) + '</div>'
           + '<div class="podium-block ' + rkB[p] + '"></div></div>';
       }).join('');
@@ -1412,16 +1422,34 @@ function renderRefs() {
   DB.getReferralsFor(currentUser.id).then(refs => {
     const verified = refs.filter(r => r.status === 'verified').length;
     document.getElementById('ref-count').textContent  = refs.length;
-    document.getElementById('ref-earned').textContent = '+' + (verified * CFG.REF_BONUS) + ' ' + CFG.TOKEN_NAME + ' channelled · +5% of all soul harvests';
+    document.getElementById('ref-earned').textContent = '+' + (verified * CFG.REF_BONUS) + ' ' + CFG.TOKEN_NAME + ' channelled, plus 5% of all soul harvests';
     const link = 'https://t.me/' + CFG.BOT_USERNAME + '/' + '?startapp=ref_' + currentUser.id;
     document.getElementById('ref-link-box').textContent = link;
-    document.getElementById('ref-list').innerHTML = refs.map(r =>
-      '<div class="ref-item"><div class="ref-av">❖</div><div class="ref-user">'
-      + '<div class="ref-uname">' + esc(r.refereeName) + '</div>'
-      + '<div class="ref-ustat ' + r.status + '">' + (r.status==='verified' ? ('Verified · +' + Math.round(r.earnedTotal) + ' channelled') : 'Awakening') + '</div>'
-      + '</div><div class="ref-bonus">' + (r.status==='verified' ? ('+' + CFG.REF_BONUS) : '---') + '</div></div>'
-    ).join('') || '<div class="empty-note">No souls invoked yet.</div>';
-  });
+document.getElementById('ref-list').innerHTML = refs.map(r => {
+  const initial = esc((r.refereeName[0]||'?').toUpperCase());
+  return '<div class="ref-item">'
+  + '<div class="ref-av">' + initial + '</div>'
+  + '<div class="ref-user">'
+  + '<div class="ref-uname">'
+  + esc(r.refereeName)
+  + (r.status === 'verified'
+      ? '<span class="verified-badge">' + CHECK_ICON_SVG + '</span>'
+      : '')
+  + '</div>'
+  + '<div class="ref-ustat ' + r.status + '">'
+  + (r.status === 'verified'
+      ? ('Verified. +' + Math.round(r.earnedTotal) + ' channelled')
+      : 'Awakening')
+  + '</div>'
+  + '</div>'
+  + '<div class="ref-bonus">'
+  + (r.status === 'verified'
+      ? ('+' + CFG.REF_BONUS)
+      : '---')
+  + '</div>'
+  + '</div>';
+}).join('') || '<div class="empty-note">No souls invoked yet.</div>';
+});
 }
 
 function copyRefLink() {
@@ -1453,7 +1481,7 @@ function maybeShowRefAd() {
 
 function shareRefLink() {
   const link = document.getElementById('ref-link-box').textContent;
-  const text = 'I invoke thee into OSARYX — mine tokens, climb the board, and acquire exclusive NFTs.';
+  const text = 'I invoke thee into OSARYX. Mine tokens, climb the board, and acquire exclusive NFTs.';
   const url  = 'https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent(text);
   if (tg) tg.openTelegramLink(url); else window.open(url, '_blank');
 }

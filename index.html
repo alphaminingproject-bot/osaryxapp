@@ -6,6 +6,9 @@
   <title>OSARYX</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="app.css"/>
   <!-- Monetag Interstitial SDK -->
   <script src='//libtl.com/sdk.js' data-zone='11273712' data-sdk='show_11273712'></script>
@@ -53,31 +56,33 @@
     <div class="splash-ring-placeholder">
       <svg width="92" height="92" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <radialGradient id="splashIris" cx="42%" cy="40%" r="62%">
-            <stop offset="0%" stop-color="#8b1a1a"/>
-            <stop offset="35%" stop-color="#5a1010"/>
-            <stop offset="70%" stop-color="#2a1006"/>
-            <stop offset="100%" stop-color="#050407"/>
-          </radialGradient>
-          <radialGradient id="splashPupil" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#3a0d0d"/>
-            <stop offset="100%" stop-color="#050407"/>
+          <radialGradient id="splashSphere" cx="38%" cy="35%" r="68%">
+            <stop offset="0%"  stop-color="#f7c46a"/>
+            <stop offset="22%" stop-color="#e0862f"/>
+            <stop offset="50%" stop-color="#af3a1e"/>
+            <stop offset="78%" stop-color="#5a1208"/>
+            <stop offset="100%" stop-color="#170905"/>
           </radialGradient>
         </defs>
-        <circle cx="120" cy="120" r="112" stroke="#6b4d1a" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <line x1="120" y1="4" x2="120" y2="20" stroke="#6b4d1a" stroke-width="2.5" opacity="0.7"/>
-        <line x1="120" y1="220" x2="120" y2="236" stroke="#6b4d1a" stroke-width="2.5" opacity="0.7"/>
-        <line x1="4" y1="120" x2="20" y2="120" stroke="#6b4d1a" stroke-width="2.5" opacity="0.7"/>
-        <line x1="220" y1="120" x2="236" y2="120" stroke="#6b4d1a" stroke-width="2.5" opacity="0.7"/>
-        <polygon points="120,30 208,78 208,168 120,216 32,168 32,78" stroke="#6b4d1a" stroke-width="2" fill="rgba(201,146,42,0.03)" opacity="0.5"/>
-        <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" fill="#050407" opacity="0.98"/>
-        <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" stroke="#6b4d1a" stroke-width="2" fill="none" opacity="0.65"/>
-        <circle cx="120" cy="120" r="36" fill="url(#splashIris)"/>
-        <circle cx="120" cy="120" r="36" stroke="#6b4d1a" stroke-width="1.5" fill="none" opacity="0.55"/>
-        <circle cx="120" cy="120" r="18" fill="url(#splashPupil)"/>
-        <ellipse cx="120" cy="120" rx="6" ry="15" fill="#020102"/>
-        <ellipse cx="120" cy="120" rx="2.5" ry="6" fill="rgba(139,26,26,0.6)"/>
-        <circle cx="112" cy="112" r="3" fill="rgba(139,26,26,0.25)"/>
+        <circle cx="120" cy="120" r="112" stroke="#8a6530" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <line x1="120" y1="4" x2="120" y2="20" stroke="#8a6530" stroke-width="2.5" opacity="0.7"/>
+        <line x1="120" y1="220" x2="120" y2="236" stroke="#8a6530" stroke-width="2.5" opacity="0.7"/>
+        <line x1="4" y1="120" x2="20" y2="120" stroke="#8a6530" stroke-width="2.5" opacity="0.7"/>
+        <line x1="220" y1="120" x2="236" y2="120" stroke="#8a6530" stroke-width="2.5" opacity="0.7"/>
+        <polygon points="120,30 208,78 208,168 120,216 32,168 32,78" stroke="#8a6530" stroke-width="2" fill="rgba(217,165,63,0.03)" opacity="0.5"/>
+        <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" fill="#0e0704" opacity="0.98"/>
+        <path d="M 30 120 Q 120 55 210 120 Q 120 185 30 120 Z" stroke="#d9a53f" stroke-width="2" fill="none" opacity="0.75"/>
+        <circle cx="120" cy="120" r="34" fill="url(#splashSphere)"/>
+        <circle cx="120" cy="120" r="34" stroke="#d9a53f" stroke-width="1.3" fill="none" opacity="0.5"/>
+        <circle cx="120" cy="120" r="27" stroke="rgba(217,165,63,0.35)" stroke-width="1" fill="none" stroke-dasharray="3 5"/>
+        <g stroke="rgba(217,165,63,0.3)" stroke-width="1">
+          <line x1="120" y1="93" x2="120" y2="103"/>
+          <line x1="120" y1="137" x2="120" y2="147"/>
+          <line x1="93" y1="120" x2="103" y2="120"/>
+          <line x1="137" y1="120" x2="147" y2="120"/>
+        </g>
+        <circle cx="120" cy="120" r="15" fill="#100804"/>
+        <circle cx="115" cy="115" r="4" fill="#f5dba6"/>
       </svg>
     </div>
     <div class="splash-spin"></div>
@@ -95,7 +100,7 @@
       <div class="header-id" id="hdr-id">ID: ---</div>
     </div>
     <div class="header-right">
-      <button class="history-btn" onclick="openHistory()" title="Ledger">⏱</button>
+      <button class="history-btn" onclick="openHistory()" title="Ledger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></button>
       <div class="header-bal">
         <div class="header-bal-num" id="hdr-bal">0</div>
         <div class="header-bal-label">OSARYX</div>
@@ -110,20 +115,32 @@
       <div class="balance-block">
         <div id="normal-mine-block">
           <div class="balance-ring">
-            <svg viewBox="0 0 160 160">
-              <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(240,180,41,0.07)" stroke-width="7"/>
-              <circle id="bal-arc" cx="80" cy="80" r="72" fill="none" stroke="url(#og)" stroke-width="7"
+            <svg viewBox="-15 -15 190 190">
+              <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(217,165,63,0.08)" stroke-width="6"/>
+              <circle id="bal-arc" cx="80" cy="80" r="72" fill="none" stroke="url(#og)" stroke-width="6"
                 stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="452"
                 transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 0.9s ease;"/>
+              <g>
+                <line x1="80.0" y1="4.0" x2="80.0" y2="-8.0" stroke="#d9a53f" stroke-width="2.2" opacity="0.85"/>
+                <line x1="118.0" y1="14.2" x2="121.5" y2="8.1" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="145.8" y1="42.0" x2="151.9" y2="38.5" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="156.0" y1="80.0" x2="168.0" y2="80.0" stroke="#d9a53f" stroke-width="2.2" opacity="0.85"/>
+                <line x1="145.8" y1="118.0" x2="151.9" y2="121.5" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="118.0" y1="145.8" x2="121.5" y2="151.9" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="80.0" y1="156.0" x2="80.0" y2="168.0" stroke="#d9a53f" stroke-width="2.2" opacity="0.85"/>
+                <line x1="42.0" y1="145.8" x2="38.5" y2="151.9" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="14.2" y1="118.0" x2="8.1" y2="121.5" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="4.0" y1="80.0" x2="-8.0" y2="80.0" stroke="#d9a53f" stroke-width="2.2" opacity="0.85"/>
+                <line x1="14.2" y1="42.0" x2="8.1" y2="38.5" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+                <line x1="42.0" y1="14.2" x2="38.5" y2="8.1" stroke="#d9a53f" stroke-width="1.2" opacity="0.4"/>
+              </g>
               <defs>
                 <linearGradient id="og" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%"   stop-color="#1a1a1a"/>
-                  <stop offset="18%"  stop-color="#8b0000"/>
-                  <stop offset="36%"  stop-color="#c88b00"/>
-                  <stop offset="54%"  stop-color="#f0b429"/>
-                  <stop offset="72%"  stop-color="#c9922a"/>
-                  <stop offset="88%"  stop-color="#7a0000"/>
-                  <stop offset="100%" stop-color="#f0b429"/>
+                  <stop offset="0%"   stop-color="#a8541f"/>
+                  <stop offset="30%"  stop-color="#d9a53f"/>
+                  <stop offset="60%"  stop-color="#f0c56e"/>
+                  <stop offset="80%"  stop-color="#d97a3f"/>
+                  <stop offset="100%" stop-color="#a8541f"/>
                 </linearGradient>
               </defs>
             </svg>
@@ -131,29 +148,30 @@
               <div class="ring-logo">
                 <svg width="110" height="110" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <radialGradient id="ringIris" cx="42%" cy="40%" r="62%">
-                      <stop offset="0%" stop-color="#8b1a1a"/>
-                      <stop offset="35%" stop-color="#5a1010"/>
-                      <stop offset="70%" stop-color="#2a1006"/>
-                      <stop offset="100%" stop-color="#050407"/>
-                    </radialGradient>
-                    <radialGradient id="ringPupil" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#3a0d0d"/>
-                      <stop offset="100%" stop-color="#050407"/>
+                    <radialGradient id="ringSphere" cx="38%" cy="35%" r="68%">
+                      <stop offset="0%"  stop-color="#f7c46a"/>
+                      <stop offset="22%" stop-color="#e0862f"/>
+                      <stop offset="50%" stop-color="#af3a1e"/>
+                      <stop offset="78%" stop-color="#5a1208"/>
+                      <stop offset="100%" stop-color="#170905"/>
                     </radialGradient>
                   </defs>
-                  <polygon points="120,18 218,72 218,168 120,222 22,168 22,72" stroke="#6b4d1a" stroke-width="3" fill="rgba(201,146,42,0.03)" opacity="0.55"/>
-                  <path d="M 16 120 Q 120 38 224 120 Q 120 202 16 120 Z" fill="#050407" opacity="1"/>
-                  <path d="M 16 120 Q 120 38 224 120 Q 120 202 16 120 Z" stroke="#6b4d1a" stroke-width="3" fill="none" opacity="0.7"/>
-                  <circle cx="120" cy="120" r="56" fill="url(#ringIris)"/>
-                  <circle cx="120" cy="120" r="56" stroke="#6b4d1a" stroke-width="2" fill="none" opacity="0.6"/>
-                  <circle cx="120" cy="120" r="46" stroke="rgba(139,26,26,0.25)" stroke-width="1" fill="none" stroke-dasharray="4 6"/>
-                  <circle cx="120" cy="120" r="28" fill="url(#ringPupil)"/>
-                  <circle cx="120" cy="120" r="28" stroke="rgba(58,13,13,0.8)" stroke-width="1.5" fill="none"/>
-                  <ellipse cx="120" cy="120" rx="9" ry="24" fill="#020102"/>
-                  <ellipse cx="120" cy="120" rx="9" ry="24" stroke="rgba(139,26,26,0.5)" stroke-width="1" fill="none"/>
-                  <ellipse cx="120" cy="120" rx="3.5" ry="9" fill="rgba(139,26,26,0.7)"/>
-                  <circle cx="105" cy="105" r="4" fill="rgba(139,26,26,0.3)"/>
+                  <polygon points="120,18 218,72 218,168 120,222 22,168 22,72" stroke="#8a6530" stroke-width="3" fill="rgba(217,165,63,0.03)" opacity="0.55"/>
+                  <path d="M 16 120 Q 120 38 224 120 Q 120 202 16 120 Z" fill="#0e0704" opacity="1"/>
+                  <path d="M 16 120 Q 120 38 224 120 Q 120 202 16 120 Z" stroke="#d9a53f" stroke-width="3" fill="none" opacity="0.8"/>
+                  <circle cx="120" cy="120" r="52" fill="url(#ringSphere)"/>
+                  <circle cx="120" cy="120" r="52" stroke="#d9a53f" stroke-width="1.5" fill="none" opacity="0.55"/>
+                  <circle cx="120" cy="120" r="42" stroke="rgba(217,165,63,0.35)" stroke-width="1" fill="none" stroke-dasharray="4 6"/>
+                  <g stroke="rgba(217,165,63,0.32)" stroke-width="1.2">
+                    <line x1="120" y1="72" x2="120" y2="86"/>
+                    <line x1="120" y1="154" x2="120" y2="168"/>
+                    <line x1="72" y1="120" x2="86" y2="120"/>
+                    <line x1="154" y1="120" x2="168" y2="120"/>
+                  </g>
+                  <circle cx="120" cy="120" r="23" fill="#100804"/>
+                  <circle cx="120" cy="120" r="23" stroke="rgba(217,165,63,0.4)" stroke-width="1" fill="none"/>
+                  <circle cx="112" cy="112" r="6" fill="#f5dba6"/>
+                  <circle cx="112" cy="112" r="10" fill="rgba(245,219,166,0.18)"/>
                 </svg>
               </div>
               <div class="mult-badge" id="mult-badge" style="display:none;">2×</div>
@@ -163,7 +181,7 @@
             <div class="mining-num" id="bal-num">0</div>
             <div class="mining-label">OSARYX MINING</div>
           </div>
-          <button class="mine-btn" id="mine-btn" style="display:none;" onclick="handleMine()">⚡ HARVEST</button>
+          <button class="mine-btn" id="mine-btn" style="display:none;" onclick="handleMine()">HARVEST</button>
           <div class="mine-timer" id="mine-timer"></div>
         </div>
 
@@ -194,13 +212,13 @@
 
     <!-- TASKS -->
     <div class="page" id="page-tasks">
-      <div class="sec-title">✦ SACRED QUESTS</div>
+      <div class="sec-title">SACRED QUESTS</div>
       <div id="tasks-list"></div>
     </div>
 
     <!-- SHOP -->
     <div class="page" id="page-shop">
-      <div class="sec-title">✦ ARCANE FORGE</div>
+      <div class="sec-title">ARCANE FORGE</div>
       <div class="sub-tabs">
         <button class="sub-tab active" onclick="switchSubTab('miners',this)">RUNES</button>
         <button class="sub-tab" onclick="switchSubTab('stake',this)">STAKING</button>
@@ -209,22 +227,22 @@
       </div>
 
       <div class="sub-page active" id="sub-miners">
-        <div class="forge-section-title">⚡ EPIC GOD</div>
+        <div class="forge-section-title">EPIC GOD</div>
         <div class="zeus-card" onclick="openZeusModal()">
           <div class="zeus-card-art">
             <div class="zeus-mini-sigil">
               <div class="zeus-mini-ring"></div>
-              <div class="zeus-mini-bolt">⚡</div>
+              <div class="zeus-mini-bolt"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
             </div>
           </div>
           <div class="zeus-card-body">
             <div class="zeus-card-name">Zeus, God of Lightning</div>
             <div class="zeus-card-desc">10× mining speed · 7 days · accrues automatically, no claiming</div>
-            <div class="zeus-card-price" id="zeus-price-display">1 ✦ Stars or TON</div>
+            <div class="zeus-card-price" id="zeus-price-display">Stars or TON</div>
           </div>
         </div>
 
-        <div class="forge-section-title">⚡ MULTIPLIER RUNES</div>
+        <div class="forge-section-title">MULTIPLIER RUNES</div>
         <div class="storage-list">
           <div class="storage-card">
             <div class="storage-info">
@@ -242,7 +260,7 @@
           </div>
         </div>
 
-        <div class="forge-section-title">⏳ STORAGE VESSELS</div>
+        <div class="forge-section-title">STORAGE VESSELS</div>
         <div class="storage-list">
           <div class="storage-card">
             <div class="storage-info"><div class="storage-name">6-Hour Vessel</div><div class="storage-sub">Claim every 6 hours · 3 days</div></div>
@@ -261,7 +279,7 @@
 
       <div class="sub-page" id="sub-stake">
         <div class="stake-hero">
-          <div class="stake-hero-symbol">⚖</div>
+          <div class="stake-hero-symbol"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7l-3 6a3 3 0 006 0zM19 7l-3 6a3 3 0 006 0zM5 7h14M5 7l2-2M19 7l-2-2"/></svg></div>
           <div class="stake-hero-title">THE ETERNAL VAULT</div>
           <div class="stake-hero-sub">Consecrate OSARYX to the Vault.<br>Every 1,000 staked yields 100 over 7 days.</div>
           <div class="stake-rate-card"><div class="stake-rate-num">10%</div><div class="stake-rate-label">YIELD PER 7 DAYS</div></div>
@@ -273,42 +291,42 @@
             <button class="stake-max-btn" onclick="stakeSetMax()">MAX</button>
           </div>
           <div class="stake-preview" id="stake-preview"></div>
-          <button class="miner-buy-btn" onclick="doStake()" style="margin-top:14px;">⚖ CONSECRATE TO THE VAULT</button>
+          <button class="miner-buy-btn" onclick="doStake()" style="margin-top:14px;">CONSECRATE TO THE VAULT</button>
         </div>
-        <div class="sec-title" style="margin-top:20px;">✦ YOUR ACTIVE VAULTS</div>
+        <div class="sec-title" style="margin-top:20px;">YOUR ACTIVE VAULTS</div>
         <div id="stake-list"></div>
       </div>
 
       <div class="sub-page" id="sub-nft">
-        <div class="sec-title">✦ OSARYX NFTS</div>
+        <div class="sec-title">OSARYX NFTS</div>
         <div class="coming-soon-wrap" id="osaryx-nft-coming-soon">
-          <div class="coming-soon-btn">✦ COMING SOON ✦</div>
+          <div class="coming-soon-btn">COMING SOON</div>
           <div class="coming-soon-sub">THE MYSTIC RELIQUARY AWAKENS SOON</div>
         </div>
         <div id="osaryx-nft-list" style="display:none;"></div>
       </div>
 
       <div class="sub-page" id="sub-market">
-        <div class="sec-title">✦ NFT MARKET</div>
+        <div class="sec-title">NFT MARKET</div>
         <div id="nft-market-list"></div>
       </div>
     </div>
 
     <!-- ROADMAP -->
     <div class="page" id="page-road">
-      <div class="sec-title">✦ THE PROPHECY</div>
+      <div class="sec-title">THE PROPHECY</div>
       <div class="roadmap">
         <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">The Awakening</div><div class="rm-sub">OSARYX Token airdrop descends</div></div></div>
-        <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">⚖ The Eternal Vault</div><div class="rm-sub">Staking ritual unlocked</div></div></div>
+        <div class="rm-item"><div class="rm-dot done"></div><div><div class="rm-name">The Eternal Vault</div><div class="rm-sub">Staking ritual unlocked</div></div></div>
         <div class="rm-item"><div class="rm-dot current"></div><div><div class="rm-name">The Mystic Reliquary</div><div class="rm-sub">Exclusive NFT artefacts forge their forms</div></div></div>
-        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">The Grand Transmutation</div><div class="rm-sub">OSARYX → GRAM — the final alchemy</div></div></div>
+        <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">The Grand Transmutation</div><div class="rm-sub">OSARYX to GRAM, the final alchemy</div></div></div>
         <div class="rm-item"><div class="rm-dot future"></div><div><div class="rm-name">The Ascension</div><div class="rm-sub">OSARYX listed across exchanges</div></div></div>
       </div>
     </div>
 
     <!-- LEADERBOARD -->
     <div class="page" id="page-lb">
-      <div class="sec-title">✦ THE CHRONICLES</div>
+      <div class="sec-title">THE CHRONICLES</div>
       <div id="lb-pinned-user"></div>
       <div class="lb-podium" id="lb-podium"></div>
       <div id="lb-list"></div>
@@ -327,7 +345,7 @@
         <button class="copy-btn" onclick="copyRefLink()">COPY SCROLL</button>
         <button class="share-btn" onclick="shareRefLink()">DISPATCH VIA TELEGRAM</button>
       </div>
-      <div class="sec-title">✦ INVOKED SOULS</div>
+      <div class="sec-title">INVOKED SOULS</div>
       <div id="ref-list"></div>
     </div>
 
@@ -362,12 +380,12 @@
 </div>
 
 <div class="overlay" id="overlay-history">
-  <div class="overlay-header"><div class="overlay-title">Sacred Ledger</div><button class="overlay-close" onclick="closeOverlay('overlay-history')">✕</button></div>
+  <div class="overlay-header"><div class="overlay-title">Sacred Ledger</div><button class="overlay-close" onclick="closeOverlay('overlay-history')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
   <div class="overlay-body" id="history-body"></div>
 </div>
 
 <div class="overlay" id="overlay-profile">
-  <div class="overlay-header"><div class="overlay-title">✦ Acolyte Profile</div><button class="overlay-close" onclick="closeOverlay('overlay-profile')">✕</button></div>
+  <div class="overlay-header"><div class="overlay-title">Acolyte Profile</div><button class="overlay-close" onclick="closeOverlay('overlay-profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
   <div class="overlay-body" id="profile-body"></div>
 </div>
 
@@ -385,18 +403,18 @@
 
 <div class="modal" id="modal-zeus">
   <div class="modal-box">
-    <div class="modal-title">⚡ Awaken Zeus</div>
+    <div class="modal-title">Awaken Zeus</div>
     <div class="modal-chain-note">10× mining for 7 days. Choose your offering:</div>
-    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">✦ Pay 1 Stars</button>
-    <button class="modal-ok" style="background:linear-gradient(135deg,#0d4fd6,#1a6fff);margin-bottom:8px;" onclick="payZeusWithTon()">⬥ Pay with TON</button>
+    <button class="modal-ok" style="margin-bottom:8px;" onclick="payZeusWithStars()" id="zeus-stars-btn">Pay 1 Stars</button>
+    <button class="modal-ok" style="background:linear-gradient(135deg,#a8541f,#d97a3f);color:#150c06;margin-bottom:8px;" onclick="payZeusWithTon()">Pay with TON</button>
     <button class="modal-cancel" onclick="closeModal('modal-zeus')">CANCEL</button>
   </div>
 </div>
 
 <div class="modal" id="modal-zeus-ton">
   <div class="modal-box">
-    <div class="modal-title">⬥ Pay with TON</div>
-    <div class="modal-chain-note">⚠ Send only on the <b>TON network</b>. Other chains will be lost.</div>
+    <div class="modal-title">Pay with TON</div>
+    <div class="modal-chain-note">Send only on the <b>TON network</b>. Other chains will be lost.</div>
     <div class="ton-pay-row"><div class="ton-pay-label">AMOUNT</div><div class="ton-pay-value" id="ton-amount-display" style="color:var(--gold);font-weight:bold;">...</div></div>
     <div class="ton-pay-row"><div class="ton-pay-label">ADDRESS</div><div class="ton-pay-value" id="ton-address-display">...</div><button class="ton-copy-btn" onclick="copyTonAddress()">COPY</button></div>
     <div class="ton-pay-row"><div class="ton-pay-label">MEMO (required)</div><div class="ton-pay-value" id="ton-memo-display">...</div></div>
