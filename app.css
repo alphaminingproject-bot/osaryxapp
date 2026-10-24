@@ -405,11 +405,33 @@ body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index
   box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 16px rgba(255,61,90,0.15);
 }
 .toast.suc {
-  background: linear-gradient(135deg, rgba(13,17,28,0.98), rgba(9,11,17,0.98));
-  border-color: rgba(85,194,158,0.5);
-  border-left-color: var(--green);
-  color: rgba(160,220,200,0.95);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 16px rgba(85,194,158,0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(20, 18, 14, 0.98),
+    rgba(8, 9, 12, 0.99)
+  );
+
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-left: 3px solid #d4af37;
+
+  color: #f5f0e2;
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(212, 175, 55, 0.08),
+    inset 0 1px 0 rgba(255, 225, 140, 0.04);
+
+  border-radius: 12px;
+  padding: 15px 18px;
+
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  transition: all 0.25s ease;
 }
 
 ::-webkit-scrollbar { width:3px; }
