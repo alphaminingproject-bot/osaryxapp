@@ -1231,7 +1231,6 @@ function switchSubTab(name, btn) {
   document.getElementById('sub-' + name).classList.add('active');
   btn.classList.add('active');
   if (name === 'market')  renderNFTMarket();
-  if (name === 'nft')     renderOsaryxNFTs();
   if (name === 'stake')   renderStakes();
   if (name === 'miners')  renderShopState();
 }
