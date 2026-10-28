@@ -1600,7 +1600,7 @@ function switchPage(name, btn) {
   if (name === 'tasks') renderTasks();
   if (name === 'lb')    renderLeaderboard();
   if (name === 'ref')   renderRefs();
-  if (name === 'shop')  { renderNFTMarket(); renderOsaryxNFTs(); renderStakes(); renderShopState(); }
+  if (name === 'shop')  { renderNFTMarket(); renderStakes(); renderShopState(); }
 }
 function openOverlay(id)  { document.getElementById(id).classList.add('show'); }
 function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
