@@ -10,7 +10,7 @@ const SUPABASE_URL    = 'https://pnvzcdipmazdhkjpaasf.supabase.co';
 const SUPABASE_ANON   = 'sb_publishable_Cim6Q3kudqrXUHCaGCg4nA_mW8a1sgb';
 const TOKEN_NAME       = 'OSARYX';
 const MAX_SUPPLY       = 2300000000;
-const BOT_BACKEND_URL  = 'https://snappy-donkey-4437.osaryxbot.deno.net';
+const BOT_BACKEND_URL  = 'https://osaryxbot-backend-9lih.onrender.com';
 const MEMBER_CHECK_URL = 'https://hard-warthog-2361.alphaminingproject-bot.deno.net';  /* URL of the separate member-check-bot on Deno Deploy */
 
 const SB = (function () {
